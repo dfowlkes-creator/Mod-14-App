@@ -129,25 +129,71 @@ Users now see the login page first when opening the app.
 
 ---
 
-## ✏️ Prompt - 02
+## ✏️ Prompt - 03
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Making the login page identical to the wireframe with proper logo, credentials validation, and navigation to Restaurants page.
 
-Paste your prompt or question here
+I need the login page to be identical to the wireframe authentication page. The page must look identical to the wireframe. I also need for these requirements to be met: Entering the correct credentials for login will take the user to the restaurant page. Display an inline error message above the Login button when attempting to log in with the incorrect credentials.
 
-## 🤖 Response - 02
+## 🤖 Response - 03
 
-Paste the AI's answer here
+Updated LoginScreen.tsx to match the wireframe exactly with:
+
+- Rocket Food logo (AppLogoV2.png) displayed at the top with proper styling
+- "Sign In" title centered below the logo
+- Email and password input fields with proper styling and placeholders
+- Hardcoded credentials: email: `user@rocketfood.com`, password: `password123`
+- Navigation to Restaurants page on successful login
+- Inline error message displayed above the Login button for incorrect credentials
+- "Forgot Password?" link at the bottom
+- Professional styling matching the wireframe layout
+
+Also created RestaurantsScreen.tsx and added it to the navigation stack.
 
 ---
 
-## ✏️ Prompt - 03
+## ✏️ Prompt - 04
+
+**📎 Context:** Fixing image path error preventing the app from loading.
+
+The app won't load due to an image path error.
+
+## 🤖 Response - 04
+
+Fixed the image path in LoginScreen.tsx from `../../assets/Images/AppLogoV2.png` to `../../../assets/Images/AppLogoV2.png` (three directory levels up instead of two). The path needed to go from `src/navigation/screens/` up to the project root to reach the assets folder.
+
+---
+
+## ✏️ Prompt - 05
+
+**📎 Context:** Updating the Restaurants page to match the wireframe exactly with grid layout, images, filters, and bottom navigation.
+
+The app Restaurants page isn't identical to the wireframe. The page needs to look exactly like the wireframe for Restaurants Page (without filter functionality).
+
+## 🤖 Response - 05
+
+Completely redesigned RestaurantsScreen.tsx to match the wireframe with:
+
+- Header section with Rocket Food logo and "LOG OUT" button
+- "NEARBY RESTAURANTS" section title
+- Rating and Price filter dropdowns (styled in red with "-- Select --" text)
+- "RESTAURANTS" section title
+- 2-column grid layout for restaurant cards
+- Restaurant cards with food images, name, and star ratings
+- Sample restaurants: Golden Bar & Grill ($$), WJU Eats ($$), Sweet Dragon ($), Golden Creamery ($), Pizza Paradise ($$), Pasta House ($$)
+- Bottom navigation bar with "Restaurants" and "OrderHistory" tabs with icons
+- Used actual cuisine images from assets/Images/Restaurants/ folder
+- Professional styling matching the wireframe color scheme and layout
+
+---
+
+## ✏️ Prompt - 06
 
 **📎 Context:** Write what you were working on here
 
 Paste your prompt or question here
 
-## 🤖 Response - 03
+## 🤖 Response - 06
 
 Paste the AI's answer here
 
