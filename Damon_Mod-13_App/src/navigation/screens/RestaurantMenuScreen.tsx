@@ -25,6 +25,7 @@ export default function RestaurantMenuScreen() {
   
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [orderStatus, setOrderStatus] = useState<'processing' | 'success' | 'failure' | null>(null);
 
   useEffect(() => {
     const initialQuantities: { [key: string]: number } = {};
@@ -63,6 +64,25 @@ export default function RestaurantMenuScreen() {
   const handleCreateOrder = () => {
     if (!isCreateOrderDisabled) {
       setShowOrderModal(true);
+      setOrderStatus(null);
+    }
+  };
+
+  const handleConfirmOrder = () => {
+    setOrderStatus('processing');
+    
+    // Simulate API call
+    setTimeout(() => {
+      const success = false; // Change to true for success, false for failure, or Math.random() > 0.3 for 70% success rate
+      setOrderStatus(success ? 'success' : 'failure');
+    }, 2000);
+  };
+
+  const handleCloseModal = () => {
+    setShowOrderModal(false);
+    setOrderStatus(null);
+    if (orderStatus === 'success') {
+      navigation.goBack();
     }
   };
 
@@ -139,14 +159,14 @@ export default function RestaurantMenuScreen() {
         visible={showOrderModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowOrderModal(false)}
+        onRequestClose={handleCloseModal}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Order Confirmation</Text>
               <TouchableOpacity 
-                onPress={() => setShowOrderModal(false)}
+                onPress={handleCloseModal}
                 style={styles.closeButton}
               >
                 <Text style={styles.closeButtonText}>X</Text>
@@ -168,17 +188,58 @@ export default function RestaurantMenuScreen() {
                 <Text style={styles.totalLabel}>TOTAL:</Text>
                 <Text style={styles.totalPrice}>$ {getTotalPrice().toFixed(2)}</Text>
               </View>
+
+              {orderStatus === 'processing' && (
+                <View style={styles.statusContainer}>
+                  <Text style={styles.processingText}>Processing Order...</Text>
+                </View>
+              )}
+
+              {orderStatus === 'success' && (
+                <View style={styles.statusContainer}>
+                  <View style={styles.successIcon}>
+                    <Text style={styles.iconText}>✓</Text>
+                  </View>
+                  <Text style={styles.successText}>Your order has been placed successfully.</Text>
+                </View>
+              )}
+
+              {orderStatus === 'failure' && (
+                <View style={styles.statusContainer}>
+                  <View style={styles.failureIcon}>
+                    <Text style={styles.iconText}>✕</Text>
+                  </View>
+                  <Text style={styles.failureText}>Your order could not be placed successfully. Please try again.</Text>
+                </View>
+              )}
             </View>
             
-            <TouchableOpacity 
-              style={styles.confirmButton}
-              onPress={() => {
-                setShowOrderModal(false);
-                navigation.goBack();
-              }}
-            >
-              <Text style={styles.confirmButtonText}>CONFIRM ORDER</Text>
-            </TouchableOpacity>
+            {orderStatus === null && (
+              <TouchableOpacity 
+                style={styles.confirmButton}
+                onPress={handleConfirmOrder}
+              >
+                <Text style={styles.confirmButtonText}>CONFIRM ORDER</Text>
+              </TouchableOpacity>
+            )}
+
+            {orderStatus === 'processing' && (
+              <TouchableOpacity 
+                style={[styles.confirmButton, styles.confirmButtonDisabled]}
+                disabled={true}
+              >
+                <Text style={styles.confirmButtonText}>Processing Order...</Text>
+              </TouchableOpacity>
+            )}
+
+            {orderStatus === 'failure' && (
+              <TouchableOpacity 
+                style={styles.confirmButton}
+                onPress={handleConfirmOrder}
+              >
+                <Text style={styles.confirmButtonText}>CONFIRM ORDER</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </Modal>
@@ -406,10 +467,59 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: 'center',
   },
+  confirmButtonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
+  },
   confirmButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
     letterSpacing: 0.5,
+  },
+  statusContainer: {
+    alignItems: 'center',
+    marginTop: 24,
+    paddingVertical: 16,
+  },
+  processingText: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+  },
+  successIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#5cb85c',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  failureIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#d9534f',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  iconText: {
+    fontSize: 36,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  successText: {
+    fontSize: 14,
+    color: '#5cb85c',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  failureText: {
+    fontSize: 14,
+    color: '#d9534f',
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });
