@@ -3,8 +3,10 @@ type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Details: undefined;
+  Restaurants: undefined;
 };
 import LoginScreen from './navigation/screens/LoginScreen';
+import RestaurantsScreen from './navigation/screens/RestaurantsScreen';
 
 import * as React from 'react';
 import { View, Text } from 'react-native';
@@ -46,6 +48,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
         <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Overview' }} />
         <Stack.Screen name="Details" component={DetailsScreen} />
+        <Stack.Screen name="Restaurants" component={RestaurantsScreen} options={{ title: 'Restaurants' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

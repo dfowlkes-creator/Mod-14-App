@@ -1,34 +1,131 @@
-# Module X – Module's Name
-
-> 🚨 **Replace `X` with your module number and `Module's Name` with the actual module name.**
-
-## 🎯 Purpose
-
-> Track your AI interactions (GitHub Copilot, ChatGPT, Claude, etc.) to reflect on learning, practice markdown, and build a reference for future projects.
-
-### 💡 What to Document
-
-> Document all your AI Assist interactions, including questions you ask, code explanations, implementation help, debugging assistance, learning conversations, code reviews, planning discussions, refactoring help, tool usage, career advice, and more.
->
-> **Remember:** There's no such thing as a "dumb question" when learning to code. Document everything!
-
-### 📝 How to Use This Log
-
-> 1. Provide **📎 Context** on what you were working on so the coach can understand the purpose of your question.
-> 2. Paste your exact question under **📎 Context** in the relevant **Prompt – XX** section.
-> 3. Paste the AI’s full answer under **Response – XX** in the relevant section.
-
----
+# Module 13 – FSO-1613 Mobile Development 1
 
 ## ✏️ Prompt - 01
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Creating a login/authentication page and integrating it into the navigation stack for a React Native Expo app.
 
-Paste your prompt or question here
+How do I create a login/authentication page using a wireframe reference?
 
 ## 🤖 Response - 01
 
-Paste the AI's answer here
+To create a login/authentication page based on your wireframe reference:
+
+1. Review the wireframe for required UI elements (logo, input fields, button, etc.).
+2. Create a new screen component (e.g., LoginScreen.tsx) in src/navigation/screens/.
+3. Build the UI using React Native components and style it to match the wireframe.
+4. Add state and logic for form fields and error messages.
+5. Integrate the screen into your navigation stack and set it as the initial route if needed.
+6. (Optional) Connect to backend for authentication.
+
+Example skeleton for LoginScreen.tsx:
+
+```tsx
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
+    // Backend integration will be added later
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Logo component or image can be added here */}
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+      <Button title="Login" onPress={handleLogin} />
+      <TouchableOpacity>
+        <Text style={styles.link}>Forgot Password?</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  title: { fontSize: 24, marginBottom: 24 },
+  input: {
+    width: "100%",
+    padding: 12,
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  error: { color: "red", marginBottom: 12 },
+  link: { color: "blue", marginTop: 12 },
+});
+```
+
+---
+
+## ✏️ Prompt - 02
+
+**📎 Context:** Adding the login screen to the navigation stack and setting it as the initial route.
+
+Add the login screen to navigation (no backend integration yet).
+
+## 🤖 Response - 02
+
+The LoginScreen was added to the navigation stack in App.tsx and set as the initial route:
+
+```tsx
+type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  Details: undefined;
+};
+import LoginScreen from "./navigation/screens/LoginScreen";
+// ...existing code...
+<Stack.Navigator initialRouteName="Login">
+  <Stack.Screen
+    name="Login"
+    component={LoginScreen}
+    options={{ title: "Login" }}
+  />
+  <Stack.Screen
+    name="Home"
+    component={HomeScreen}
+    options={{ title: "Overview" }}
+  />
+  <Stack.Screen name="Details" component={DetailsScreen} />
+</Stack.Navigator>;
+```
+
+Users now see the login page first when opening the app.
 
 ---
 
