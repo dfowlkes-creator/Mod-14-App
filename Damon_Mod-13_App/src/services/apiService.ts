@@ -31,7 +31,7 @@ interface CreateOrderRequest {
   restaurant_id: number;
   address_id: number;
   products: Array<{
-    product_id: number;
+    id: number;
     quantity: number;
   }>;
 }
@@ -73,12 +73,13 @@ export const restaurantService = {
     if (priceRange) params.price_range = priceRange;
     
     const response = await api.get('/api/restaurants', { params });
-    return response.data;
+    // Backend returns { message: "Success", data: [...] }
+    return response.data.data || response.data;
   },
   
   getById: async (id: number): Promise<Restaurant> => {
     const response = await api.get(`/api/restaurants/${id}`);
-    return response.data;
+    return response.data.data || response.data;
   },
 };
 

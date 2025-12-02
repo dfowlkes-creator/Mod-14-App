@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, ActivityIndicator } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { productService, orderService } from '../../services/apiService';
 
 type RootStackParamList = {
   Login: undefined;
@@ -11,46 +12,55 @@ type RootStackParamList = {
 };
 
 interface MenuItem {
-  id: string;
+  id: number;
   name: string;
-  description: string;
-  price: number;
+  cost: number;
 }
-
-const menuItems: MenuItem[] = [
-  { id: '1', name: 'Caesar Salad', description: 'Fresh romaine lettuce with parmesan', price: 8.99 },
-  { id: '2', name: 'Grilled Chicken', description: 'Tender grilled chicken breast', price: 14.99 },
-  { id: '3', name: 'Pasta Carbonara', description: 'Classic Italian pasta dish', price: 12.99 },
-  { id: '4', name: 'Margherita Pizza', description: 'Fresh mozzarella and basil', price: 11.99 },
-  { id: '5', name: 'Fish and Chips', description: 'Beer-battered fish with fries', price: 13.99 },
-  { id: '6', name: 'Veggie Burger', description: 'Plant-based burger with fixings', price: 10.99 },
-];
 
 export default function RestaurantMenuScreen() {
   const route = useRoute();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { restaurant } = route.params as any;
   
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [orderStatus, setOrderStatus] = useState<'processing' | 'success' | 'failure' | null>(null);
 
   useEffect(() => {
-    const initialQuantities: { [key: string]: number } = {};
-    menuItems.forEach(item => {
-      initialQuantities[item.id] = 0;
-    });
-    setQuantities(initialQuantities);
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const products = await productService.getByRestaurant(restaurant.id);
+        setMenuItems(products);
+        
+        const initialQuantities: { [key: number]: number } = {};
+        products.forEach(item => {
+          initialQuantities[item.id] = 0;
+        });
+        setQuantities(initialQuantities);
+      } catch (err) {
+        console.error('Error loading menu:', err);
+        setError('Failed to load menu');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
   }, [restaurant.id]);
 
-  const incrementQuantity = (itemId: string) => {
+  const incrementQuantity = (itemId: number) => {
     setQuantities(prev => ({
       ...prev,
       [itemId]: (prev[itemId] || 0) + 1,
     }));
   };
 
-  const decrementQuantity = (itemId: string) => {
+  const decrementQuantity = (itemId: number) => {
     setQuantities(prev => ({
       ...prev,
       [itemId]: Math.max(0, (prev[itemId] || 0) - 1),
@@ -63,7 +73,7 @@ export default function RestaurantMenuScreen() {
 
   const getTotalPrice = () => {
     return menuItems.reduce((sum, item) => {
-      return sum + (quantities[item.id] || 0) * item.price;
+      return sum + (quantities[item.id] || 0) * item.cost;
     }, 0);
   };
 
@@ -76,14 +86,30 @@ export default function RestaurantMenuScreen() {
     }
   };
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = async () => {
     setOrderStatus('processing');
     
-    // Simulate API call
-    setTimeout(() => {
-      const success = true; // Change to true for success, false for failure, or Math.random() > 0.3 for 70% success rate
-      setOrderStatus(success ? 'success' : 'failure');
-    }, 2000);
+    try {
+      const customerId = (global as any).customerId || 1;
+      const products = menuItems
+        .filter(item => quantities[item.id] > 0)
+        .map(item => ({
+          id: item.id,
+          quantity: quantities[item.id],
+        }));
+      
+      await orderService.create({
+        customer_id: customerId,
+        restaurant_id: restaurant.id,
+        address_id: 1, // Using default address
+        products,
+      });
+      
+      setOrderStatus('success');
+    } catch (err) {
+      console.error('Error creating order:', err);
+      setOrderStatus('failure');
+    }
   };
 
   const handleCloseModal = () => {
@@ -122,7 +148,7 @@ export default function RestaurantMenuScreen() {
           <View style={styles.headerSection}>
             <View style={styles.restaurantInfo}>
               <Text style={styles.restaurantName}>{restaurant.name}</Text>
-              <Text style={styles.priceIndicator}>Price: {restaurant.price}</Text>
+              <Text style={styles.priceIndicator}>Price: {restaurant.price_range ? '$'.repeat(restaurant.price_range) : 'N/A'}</Text>
               <Text style={styles.stars}>Rating: {('★').repeat(restaurant.rating)}</Text>
             </View>
             <TouchableOpacity 
@@ -142,39 +168,53 @@ export default function RestaurantMenuScreen() {
             </TouchableOpacity>
           </View>
           
-          <View style={styles.menuSection}>
-            {menuItems.map((item) => (
-              <View key={item.id} style={styles.menuItem}>
-                <Image 
-                  source={require('../../../assets/Images/RestaurantMenu.jpg')}
-                  style={styles.menuItemImage}
-                />
-                <View style={styles.menuItemInfo}>
-                  <Text style={styles.menuItemName}>{item.name}</Text>
-                  <Text style={styles.menuItemDescription}>{item.description}</Text>
-                  <Text style={styles.menuItemPrice}>${item.price.toFixed(2)}</Text>
-                </View>
-                
-                <View style={styles.quantityControls}>
-                  <TouchableOpacity 
-                    style={styles.quantityButton}
-                    onPress={() => decrementQuantity(item.id)}
-                  >
-                    <Text style={styles.quantityButtonText}>-</Text>
-                  </TouchableOpacity>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#d9534f" />
+              <Text style={styles.loadingText}>Loading menu...</Text>
+            </View>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : menuItems.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No menu items available</Text>
+            </View>
+          ) : (
+            <View style={styles.menuSection}>
+              {menuItems.map((item) => (
+                <View key={item.id} style={styles.menuItem}>
+                  <Image 
+                    source={require('../../../assets/Images/RestaurantMenu.jpg')}
+                    style={styles.menuItemImage}
+                  />
+                  <View style={styles.menuItemInfo}>
+                    <Text style={styles.menuItemName}>{item.name}</Text>
+                    <Text style={styles.menuItemPrice}>${item.cost.toFixed(2)}</Text>
+                  </View>
                   
-                  <Text style={styles.quantityText}>{quantities[item.id] || 0}</Text>
-                  
-                  <TouchableOpacity 
-                    style={styles.quantityButton}
-                    onPress={() => incrementQuantity(item.id)}
-                  >
-                    <Text style={styles.quantityButtonText}>+</Text>
-                  </TouchableOpacity>
+                  <View style={styles.quantityControls}>
+                    <TouchableOpacity 
+                      style={styles.quantityButton}
+                      onPress={() => decrementQuantity(item.id)}
+                    >
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    </TouchableOpacity>
+                    
+                    <Text style={styles.quantityText}>{quantities[item.id] || 0}</Text>
+                    
+                    <TouchableOpacity 
+                      style={styles.quantityButton}
+                      onPress={() => incrementQuantity(item.id)}
+                    >
+                      <Text style={styles.quantityButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -225,7 +265,7 @@ export default function RestaurantMenuScreen() {
                 <View key={item.id} style={styles.orderItem}>
                   <Text style={styles.orderItemName}>{item.name}</Text>
                   <Text style={styles.orderItemQuantity}>x{quantities[item.id]}</Text>
-                  <Text style={styles.orderItemPrice}>$ {(item.price * quantities[item.id]).toFixed(2)}</Text>
+                  <Text style={styles.orderItemPrice}>$ {(item.cost * quantities[item.id]).toFixed(2)}</Text>
                 </View>
               ))}
               
@@ -385,11 +425,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
-  },
-  menuItemDescription: {
-    fontSize: 14,
-    color: '#666',
     marginBottom: 4,
   },
   menuItemPrice: {
@@ -591,6 +626,32 @@ const styles = StyleSheet.create({
     color: '#d9534f',
     textAlign: 'center',
     fontWeight: '600',
+  },
+  loadingContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
   },
   bottomNav: {
     position: 'absolute',

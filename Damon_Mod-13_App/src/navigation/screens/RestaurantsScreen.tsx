@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useMemo, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal, ActivityIndicator } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { restaurantService } from '../../services/apiService';
 
 type RootStackParamList = {
   Login: undefined;
@@ -12,69 +13,75 @@ type RootStackParamList = {
   OrderHistory: undefined;
 };
 
-const restaurants = [
-  {
-    id: '1',
-    name: 'Golden Bar & Grill ($$$)',
-    image: require('../../../assets/Images/Restaurants/cuisineGreek.jpg'),
-    rating: 5,
-    price: '$$$',
-  },
-  {
-    id: '2',
-    name: 'WJU Eats ($)',
-    image: require('../../../assets/Images/Restaurants/cuisineJapanese.jpg'),
-    rating: 3,
-    price: '$',
-  },
-  {
-    id: '3',
-    name: 'Sweet Dragon ($$)',
-    image: require('../../../assets/Images/Restaurants/cuisineSoutheast.jpg'),
-    rating: 4,
-    price: '$$',
-  },
-  {
-    id: '4',
-    name: 'Golden Creamery ($)',
-    image: require('../../../assets/Images/Restaurants/cuisineViet.jpg'),
-    rating: 3,
-    price: '$',
-  },
-  {
-    id: '5',
-    name: 'Pizza Paradise ($$)',
-    image: require('../../../assets/Images/Restaurants/cuisinePizza.jpg'),
-    rating: 4,
-    price: '$$',
-  },
-  {
-    id: '6',
-    name: 'Pasta House ($$$)',
-    image: require('../../../assets/Images/Restaurants/cuisinePasta.jpg'),
-    rating: 5,
-    price: '$$$',
-  },
-];
+interface Restaurant {
+  id: number;
+  name: string;
+  rating: number;
+  price_range: number;
+}
+
+const restaurantImages: { [key: string]: any } = {
+  'Greek': require('../../../assets/Images/Restaurants/cuisineGreek.jpg'),
+  'Japanese': require('../../../assets/Images/Restaurants/cuisineJapanese.jpg'),
+  'Southeast': require('../../../assets/Images/Restaurants/cuisineSoutheast.jpg'),
+  'Vietnamese': require('../../../assets/Images/Restaurants/cuisineViet.jpg'),
+  'Pizza': require('../../../assets/Images/Restaurants/cuisinePizza.jpg'),
+  'Pasta': require('../../../assets/Images/Restaurants/cuisinePasta.jpg'),
+  'default': require('../../../assets/Images/RestaurantMenu.jpg'),
+};
+
+const getPriceString = (priceRange: number): string => {
+  return '$'.repeat(priceRange);
+};
+
+const getRestaurantImage = (name: string) => {
+  const nameLower = name.toLowerCase();
+  if (nameLower.includes('greek')) return restaurantImages.Greek;
+  if (nameLower.includes('japanese')) return restaurantImages.Japanese;
+  if (nameLower.includes('dragon') || nameLower.includes('southeast')) return restaurantImages.Southeast;
+  if (nameLower.includes('viet')) return restaurantImages.Vietnamese;
+  if (nameLower.includes('pizza')) return restaurantImages.Pizza;
+  if (nameLower.includes('pasta')) return restaurantImages.Pasta;
+  return restaurantImages.default;
+};
 
 export default function RestaurantsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
-  const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showPriceModal, setShowPriceModal] = useState(false);
+
+  const loadRestaurants = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await restaurantService.getAll(selectedRating || undefined, selectedPrice || undefined);
+      setRestaurants(data);
+    } catch (err) {
+      console.error('Error loading restaurants:', err);
+      setError('Failed to load restaurants');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      loadRestaurants();
+    }, [selectedRating, selectedPrice])
+  );
 
   const renderStars = (count: number) => {
     return '★'.repeat(count);
   };
 
   const filteredRestaurants = useMemo(() => {
-    return restaurants.filter(restaurant => {
-      const matchesRating = selectedRating === null || restaurant.rating === selectedRating;
-      const matchesPrice = selectedPrice === null || restaurant.price === selectedPrice;
-      return matchesRating && matchesPrice;
-    });
-  }, [selectedRating, selectedPrice]);
+    return restaurants;
+  }, [restaurants]);
 
   const handleRestaurantPress = (restaurant: any) => {
     navigation.navigate('RestaurantMenu', { restaurant });
@@ -120,7 +127,7 @@ export default function RestaurantsScreen() {
             onPress={() => setShowPriceModal(true)}
           >
             <Text style={styles.filterButtonText}>
-              {selectedPrice || '-- Select --'}
+              {selectedPrice ? getPriceString(selectedPrice) : '-- Select --'}
             </Text>
             <Text style={styles.dropdownArrow}>▼</Text>
           </TouchableOpacity>
@@ -131,26 +138,46 @@ export default function RestaurantsScreen() {
         <Text style={styles.restaurantsTitle}>RESTAURANTS</Text>
       </View>
 
-      <FlatList
-        data={filteredRestaurants}
-        keyExtractor={item => item.id}
-        numColumns={2}
-        contentContainerStyle={styles.listContainer}
-        columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={styles.card}
-            onPress={() => handleRestaurantPress(item)}
-          >
-            <Image source={item.image} style={styles.restaurantImage} />
-            <View style={styles.cardContent}>
-              <Text style={styles.restaurantName}>{item.name}</Text>
-              <Text style={styles.stars}>{renderStars(item.rating)}</Text>
-            </View>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#d9534f" />
+          <Text style={styles.loadingText}>Loading restaurants...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadRestaurants}>
+            <Text style={styles.retryButtonText}>Retry</Text>
           </TouchableOpacity>
-        )}
-      />
+        </View>
+      ) : filteredRestaurants.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No restaurants found</Text>
+          <Text style={styles.emptySubtext}>Try adjusting your filters</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={filteredRestaurants}
+          keyExtractor={item => item.id.toString()}
+          numColumns={2}
+          contentContainerStyle={styles.listContainer}
+          columnWrapperStyle={styles.row}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity 
+              style={styles.card}
+              onPress={() => handleRestaurantPress(item)}
+            >
+              <Image source={getRestaurantImage(item.name)} style={styles.restaurantImage} />
+              <View style={styles.cardContent}>
+                <Text style={styles.restaurantName}>{item.name}</Text>
+                <Text style={styles.stars}>{renderStars(item.rating)}</Text>
+                <Text style={styles.priceText}>{getPriceString(item.price_range)}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
 
       {/* Rating Filter Modal */}
       <Modal
@@ -214,7 +241,7 @@ export default function RestaurantsScreen() {
             >
               <Text style={styles.modalOptionText}>All Prices</Text>
             </TouchableOpacity>
-            {['$', '$$', '$$$'].map(price => (
+            {[1, 2, 3].map(price => (
               <TouchableOpacity
                 key={price}
                 style={styles.modalOption}
@@ -223,7 +250,7 @@ export default function RestaurantsScreen() {
                   setShowPriceModal(false);
                 }}
               >
-                <Text style={styles.modalOptionText}>{price}</Text>
+                <Text style={styles.modalOptionText}>{getPriceString(price)}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -347,10 +374,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
     overflow: 'hidden',
   },
@@ -371,6 +395,61 @@ const styles = StyleSheet.create({
   stars: {
     fontSize: 14,
     color: '#333',
+  },
+  priceText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: '#d9534f',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#666',
   },
   bottomNav: {
     position: 'absolute',

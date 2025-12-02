@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { authService } from '../../services/apiService';
 
 type RootStackParamList = {
   Login: undefined;
@@ -14,22 +15,33 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // Hardcoded credentials for demo
-const CORRECT_EMAIL = 'erica.ger@gmail.com';
-const CORRECT_PASSWORD = 'password';  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
-    if (email === CORRECT_EMAIL && password === CORRECT_PASSWORD) {
+    
+    try {
+      setLoading(true);
       setError('');
-      // Set the global customer ID for API calls
-      (global as any).customerId = 1;
-      navigation.navigate('Restaurants');
-    } else {
-      setError('Incorrect email or password. Please try again.');
+      
+      const response = await authService.login({ email, password });
+      
+      if (response.success) {
+        // Set the global customer ID for API calls
+        (global as any).customerId = response.customer_id || 1;
+        navigation.navigate('Restaurants');
+      } else {
+        setError('Incorrect email or password. Please try again.');
+      }
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,8 +93,16 @@ const CORRECT_PASSWORD = 'password';  const handleLogin = () => {
           
           {error ? <Text style={styles.error}>{error}</Text> : null}
           
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>LOG IN</Text>
+          <TouchableOpacity 
+            style={[styles.button, loading && styles.buttonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>LOG IN</Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -114,13 +134,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     padding: 32,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
   },
   titleContainer: {
@@ -168,6 +182,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
+  },
+  buttonDisabled: {
+    backgroundColor: '#ccc',
+    opacity: 0.7,
   },
   buttonText: {
     color: '#fff',

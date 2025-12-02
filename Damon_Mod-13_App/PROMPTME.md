@@ -458,15 +458,146 @@ Only the dropdown arrow was added to the price filter; the default placeholder t
 
 ---
 
-## ✏️ Prompt - 05
+## ✏️ Prompt - 18
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Creating OrderHistory screen with API integration to display customer's order history from backend database.
 
-Paste your prompt or question here
+Create an OrderHistory screen that displays all orders for the logged-in customer. The screen should fetch data from the backend API endpoint and display it in a table format with order details.
 
-## 🤖 Response - 05
+## 🤖 Response - 18
 
-Paste the AI's answer here
+Created OrderHistoryScreen.tsx with complete API integration:
+
+**Features implemented:**
+
+- Header with Rocket Food logo and LOG OUT button
+- "MY ORDERS" page title
+- Table layout with columns: ORDER (restaurant name), STATUS, VIEW (🔍 icon button)
+- Data fetching from `/api/orders?type=customer&id={customerId}` endpoint
+- Loading state with ActivityIndicator and "Loading orders..." message
+- Error handling with error message and Retry button
+- Empty state with "No orders yet" message when no orders exist
+- Order detail modal showing:
+  - Restaurant name in red header text
+  - Order date, status, and courier info in white header text on black background
+  - List of ordered items with quantity and price
+  - Total cost calculation
+- Bottom navigation footer with Restaurants and OrderHistory tabs
+- Used global.customerId (set to 1 in LoginScreen) for API authentication
+- Proper transformation of API response data to match UI requirements
+
+**API Integration:**
+
+- Created `apiService.ts` with typed interfaces for Order data structure
+- Configured axios instance with baseURL `http://localhost:8080`
+- Implemented `orderService.getCustomerOrders()` method
+- Transformed backend response fields (timestamp, unit_cost, restaurant_name) to frontend format
+
+**Known Issue:** "Not logged in" error if global.customerId not set - requires LoginScreen to set this value.
+
+---
+
+## ✏️ Prompt - 19
+
+**📎 Context:** Fixing backend server connectivity and updating API baseURL for mobile device access.
+
+OrderHistory screen is failing to load orders.
+
+## 🤖 Response - 19
+
+Diagnosed and fixed multiple issues:
+
+**Problem 1: Backend server not running**
+
+- Spring Boot server was stopped
+- Started server with: `cd serverJAVA && nohup bash ./mvnw spring-boot:run > /tmp/spring-boot.log 2>&1 &`
+- Server successfully connected to MySQL database `mod13_rdelivery`
+- Verified API responding correctly with 3 orders for customer ID 1
+
+**Problem 2: API baseURL incompatible with mobile apps**
+
+- Changed `src/services/api.ts` baseURL from `http://localhost:8080` to `http://10.0.0.200:8080`
+- `localhost` doesn't work in React Native mobile/simulator environments
+- iOS Simulator and Android Emulator need the host machine's local IP address
+- Retrieved local IP: `10.0.0.200`
+
+**Root causes:**
+
+1. Backend server was not running
+2. API configuration was using localhost (only works for web, not mobile)
+
+**Solution:** Server now running in background and API properly configured with machine's local IP address accessible from mobile devices/simulators.
+
+---
+
+## ✏️ Prompt - 20
+
+**📎 Context:** Adding header and footer navigation to RestaurantMenuScreen to match requirement that all non-login pages have header and footer.
+
+Shouldn't RestaurantMenuScreen have the footer since the requirement is that all pages except the login screen have the header and footer?
+
+## 🤖 Response - 20
+
+Corrected RestaurantMenuScreen to include header and footer:
+
+**Added Header:**
+
+- Rocket Food logo on the left
+- "LOG OUT" button on the right (navigates to Login screen)
+- Consistent styling with other screens (white background, bottom border)
+
+**Added Bottom Navigation Footer:**
+
+- "Restaurants" tab with 🍔 icon
+- "OrderHistory" tab with 🕐 icon
+- Fixed positioning at bottom
+- Consistent styling across all screens
+
+**Updated scroll content:**
+
+- Increased `paddingBottom` to 100 to prevent content from being hidden behind footer
+- Proper TypeScript types added for navigation
+
+Now all screens except LoginScreen have consistent header and footer navigation as required.
+
+---
+
+## ✏️ Prompt - 21
+
+**📎 Context:** Updating LoginScreen to match the wireframe design exactly with card-based layout and proper styling.
+
+I want the login screen to look exactly like this wireframe photo. (Wireframe shows: Rocket Food logo at top, white card with "Welcome Back" title, "Login to begin" subtitle, labeled Email and Password fields, and "LOG IN" button)
+
+## 🤖 Response - 21
+
+Completely redesigned LoginScreen to match wireframe exactly:
+
+**Layout changes:**
+
+- Light gray background (#f5f5f5) instead of white
+- White card container with border, shadow, and rounded corners for the login form
+- Larger logo (380x180) to match wireframe proportions
+- Increased spacing (60px) between logo and login card
+
+**Card content:**
+
+- "Welcome Back" as main title (28px, bold)
+- "Login to begin" as subtitle (16px, gray)
+- "Email" and "Password" labels above input fields (14px, bold, dark gray)
+- Updated placeholder text: "Enter your primary email here" for email
+- Updated placeholder text: "****\*\*\*\*****" for password
+- "LOG IN" button with all caps text, letter spacing, and rusty orange color (#c9654f)
+
+**Removed elements:**
+
+- "Forgot Password?" link (not in wireframe)
+
+**Styling:**
+
+- Card has proper padding (32px), shadow, and border
+- Input fields with subtle borders and proper spacing (20px margin bottom)
+- Button with 6px border radius matching card style
+- Professional card-based design matching wireframe exactly
 
 ---
 
