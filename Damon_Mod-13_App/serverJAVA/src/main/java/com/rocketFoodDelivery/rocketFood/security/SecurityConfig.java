@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -41,34 +42,19 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    @SuppressWarnings({ "removal", "deprecation" })
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests()
-            .requestMatchers("/api/**").permitAll()
-                .requestMatchers("/api/auth").permitAll()
-                .requestMatchers("/backoffice/**").permitAll()
-                .requestMatchers("/api/restaurants").permitAll()
-                .requestMatchers("/api/products").permitAll()
-                .requestMatchers("/api/orders").permitAll()
-                .requestMatchers("/api/orders/**").permitAll()
-                .requestMatchers("/api/restaurants/**").permitAll()
-                .requestMatchers("/api/account/**").permitAll()
-                .requestMatchers("/api/orders/*/status").permitAll()
-                .anyRequest().authenticated();
-        http.exceptionHandling()
-                .authenticationEntryPoint(
-                        (request, response, ex) -> {
-                            response.sendError(
-                                    HttpServletResponse.SC_UNAUTHORIZED,
-                                    ex.getMessage()
-                            );
-                        }
-                );
-        // Remove or comment out the line below if you no longer use JwtTokenFilter
-        // http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/backoffice/**")).permitAll()
+                        .anyRequest().permitAll())
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
+                        }));
         return http.build();
     }
 

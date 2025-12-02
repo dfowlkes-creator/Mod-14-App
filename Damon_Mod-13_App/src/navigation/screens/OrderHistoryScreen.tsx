@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, ScrollView, FlatList } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, ScrollView, FlatList, ActivityIndicator } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { orderService } from '../../services/apiService';
 
 type RootStackParamList = {
   Login: undefined;
@@ -27,69 +28,55 @@ interface Order {
   items: OrderItem[];
 }
 
-// Sample order data
-const orders: Order[] = [
-  {
-    id: '1',
-    restaurantName: 'Sweet Dragon',
-    status: 'PENDING',
-    orderDate: '2025-12-01',
-    courrier: 'John Doe',
-    items: [
-      { name: 'Cheeseburger', quantity: 1, price: 0.50 },
-      { name: 'Scotch Eggs', quantity: 1, price: 20.25 },
-    ],
-  },
-  {
-    id: '2',
-    restaurantName: 'Spice BBQ',
-    status: 'PENDING',
-    orderDate: '2025-12-01',
-    courrier: 'Jane Smith',
-    items: [
-      { name: 'BBQ Ribs', quantity: 2, price: 15.99 },
-      { name: 'Coleslaw', quantity: 1, price: 3.50 },
-    ],
-  },
-  {
-    id: '3',
-    restaurantName: 'Golden Bar & Grill',
-    status: 'PENDING',
-    orderDate: '2025-11-30',
-    courrier: 'Mike Johnson',
-    items: [
-      { name: 'Steak', quantity: 1, price: 25.00 },
-      { name: 'Mashed Potatoes', quantity: 1, price: 5.00 },
-    ],
-  },
-  {
-    id: '4',
-    restaurantName: 'Sweet Dragon',
-    status: 'PENDING',
-    orderDate: '2025-11-29',
-    courrier: 'Sarah Lee',
-    items: [
-      { name: 'Spring Rolls', quantity: 3, price: 4.50 },
-      { name: 'Pad Thai', quantity: 1, price: 12.00 },
-    ],
-  },
-  {
-    id: '5',
-    restaurantName: 'WJU Eats',
-    status: 'PENDING',
-    orderDate: '2025-11-28',
-    courrier: 'Tom Wilson',
-    items: [
-      { name: 'Chicken Teriyaki', quantity: 1, price: 11.99 },
-      { name: 'Fried Rice', quantity: 1, price: 6.50 },
-    ],
-  },
-];
-
 export default function OrderHistoryScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+
+  const loadOrders = async () => {
+    if (!global.customerId) {
+      setError('Not logged in');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      const orderHistory = await orderService.getCustomerOrders(global.customerId);
+      
+      // Transform API response to match Order interface
+      const transformedOrders: Order[] = orderHistory.map(order => ({
+        id: order.id.toString(),
+        restaurantName: order.restaurant_name,
+        status: order.status,
+        orderDate: new Date(order.timestamp).toISOString().split('T')[0],
+        courrier: order.courier_name || 'Not assigned',
+        items: order.products.map(p => ({
+          name: p.product_name,
+          quantity: p.quantity,
+          price: p.unit_cost,
+        })),
+      }));
+      
+      setOrders(transformedOrders);
+    } catch (err) {
+      console.error('Error loading orders:', err);
+      setError('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load orders when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      loadOrders();
+    }, [])
+  );
 
   const handleViewOrder = (order: Order) => {
     setSelectedOrder(order);
@@ -132,21 +119,40 @@ export default function OrderHistoryScreen() {
       <View style={styles.content}>
         <Text style={styles.pageTitle}>MY ORDERS</Text>
 
-        <View style={styles.tableContainer}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.tableHeaderText}>ORDER</Text>
-            <Text style={styles.tableHeaderText}>STATUS</Text>
-            <Text style={styles.tableHeaderText}>VIEW</Text>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#d9534f" />
+            <Text style={styles.loadingText}>Loading orders...</Text>
           </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={loadOrders}>
+              <Text style={styles.retryButtonText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        ) : orders.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No orders yet</Text>
+            <Text style={styles.emptySubtext}>Your order history will appear here</Text>
+          </View>
+        ) : (
+          <View style={styles.tableContainer}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableHeaderText}>ORDER</Text>
+              <Text style={styles.tableHeaderText}>STATUS</Text>
+              <Text style={styles.tableHeaderText}>VIEW</Text>
+            </View>
 
-          <FlatList
-            data={orders}
-            keyExtractor={item => item.id}
-            renderItem={renderOrderRow}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.tableBody}
-          />
-        </View>
+            <FlatList
+              data={orders}
+              keyExtractor={item => item.id}
+              renderItem={renderOrderRow}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.tableBody}
+            />
+          </View>
+        )}
       </View>
 
       {/* Order Detail Modal */}
@@ -159,7 +165,12 @@ export default function OrderHistoryScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedOrder?.restaurantName}</Text>
+              <View style={styles.modalHeaderContent}>
+                <Text style={styles.modalTitle}>{selectedOrder?.restaurantName}</Text>
+                <Text style={styles.modalHeaderText}>Order Date: {selectedOrder?.orderDate}</Text>
+                <Text style={styles.modalHeaderText}>Status: {selectedOrder?.status?.toUpperCase()}</Text>
+                <Text style={styles.modalHeaderText}>Courrier: {selectedOrder?.courrier}</Text>
+              </View>
               <TouchableOpacity 
                 onPress={() => setShowDetailModal(false)}
                 style={styles.closeButton}
@@ -169,12 +180,6 @@ export default function OrderHistoryScreen() {
             </View>
             
             <ScrollView style={styles.modalBody}>
-              <View style={styles.orderInfo}>
-                <Text style={styles.orderInfoText}>Order Date: {selectedOrder?.orderDate}</Text>
-                <Text style={styles.orderInfoText}>Status: {selectedOrder?.status}</Text>
-                <Text style={styles.orderInfoText}>Courrier: {selectedOrder?.courrier}</Text>
-              </View>
-
               <View style={styles.itemsContainer}>
                 {selectedOrder?.items.map((item, index) => (
                   <View key={index} style={styles.orderItem}>
@@ -354,16 +359,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
+  modalHeaderContent: {
+    flex: 1,
+    paddingRight: 12,
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#d9534f',
+    marginBottom: 8,
+  },
+  modalHeaderText: {
+    fontSize: 14,
+    color: '#fff',
+    marginBottom: 4,
   },
   closeButton: {
     padding: 4,
@@ -375,14 +390,6 @@ const styles = StyleSheet.create({
   },
   modalBody: {
     padding: 24,
-  },
-  orderInfo: {
-    marginBottom: 20,
-  },
-  orderInfoText: {
-    fontSize: 14,
-    color: '#333',
-    marginBottom: 8,
   },
   itemsContainer: {
     marginBottom: 16,
@@ -429,5 +436,51 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#d9534f',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#d9534f',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 6,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#666',
   },
 });

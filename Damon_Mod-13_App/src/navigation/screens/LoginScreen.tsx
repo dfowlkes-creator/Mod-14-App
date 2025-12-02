@@ -17,16 +17,16 @@ export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // Hardcoded credentials for demo
-  const CORRECT_EMAIL = 'user@rocketfood.com';
-  const CORRECT_PASSWORD = 'password123';
-
-  const handleLogin = () => {
+const CORRECT_EMAIL = 'erica.ger@gmail.com';
+const CORRECT_PASSWORD = 'password';  const handleLogin = () => {
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
     }
     if (email === CORRECT_EMAIL && password === CORRECT_PASSWORD) {
       setError('');
+      // Set the global customer ID for API calls
+      (global as any).customerId = 1;
       navigation.navigate('Restaurants');
     } else {
       setError('Incorrect email or password. Please try again.');
@@ -43,44 +43,48 @@ export default function LoginScreen() {
         />
       </View>
       
-      <Text style={styles.title}>Sign In</Text>
-      
-      <View style={styles.form}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={(text) => {
-            setEmail(text);
-            setError('');
-          }}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          placeholderTextColor="#999"
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={(text) => {
-            setPassword(text);
-            setError('');
-          }}
-          secureTextEntry
-          placeholderTextColor="#999"
-          onSubmitEditing={handleLogin}
-          returnKeyType="go"
-        />
+      <View style={styles.loginCard}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.subtitle}>Login to begin</Text>
+        </View>
         
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.forgotPassword}>
-          <Text style={styles.link}>Forgot Password?</Text>
-        </TouchableOpacity>
+        <View style={styles.form}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your primary email here"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              setError('');
+            }}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholderTextColor="#999"
+          />
+          
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="************"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              setError('');
+            }}
+            secureTextEntry
+            placeholderTextColor="#999"
+            onSubmitEditing={handleLogin}
+            returnKeyType="go"
+          />
+          
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>LOG IN</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -89,39 +93,68 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 60,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 380,
+    height: 180,
+  },
+  loginCard: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 32,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  titleContainer: {
+    marginBottom: 24,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 32,
     color: '#333',
-    textAlign: 'center',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
   },
   form: {
     width: '100%',
-    maxWidth: 400,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
   },
   input: {
     height: 50,
     borderColor: '#ddd',
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 6,
     paddingHorizontal: 16,
-    fontSize: 16,
-    marginBottom: 16,
+    fontSize: 15,
+    marginBottom: 20,
     backgroundColor: '#fff',
+    color: '#333',
   },
   error: {
     color: '#d32f2f',
@@ -130,22 +163,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#ff6347',
-    borderRadius: 8,
+    backgroundColor: '#c9654f',
+    borderRadius: 6,
     paddingVertical: 16,
     alignItems: 'center',
-    marginBottom: 16,
+    marginTop: 8,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-  },
-  link: {
-    color: '#007AFF',
     fontSize: 16,
+    fontWeight: 'bold',
+    letterSpacing: 1,
   },
 });

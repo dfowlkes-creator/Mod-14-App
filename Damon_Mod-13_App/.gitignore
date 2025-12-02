@@ -36,3 +36,27 @@ yarn-error.*
 *.tsbuildinfo
 
 app-example
+
+# Documentation with sensitive information
+API_INTEGRATION.md
+SQL_Integration.md
+Mod_13_App_Flow.md
+DATABASE_CREDENTIALS.md
+
+# Sensitive configuration files
+**/application.properties
+**/application-*.properties
+**/.env
+**/.env.*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Security and credentials
+**/secrets/
+**/credentials/
+**/*secret*
+**/*credential*
+**/*password*

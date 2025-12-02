@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Login: undefined;
+  Restaurants: undefined;
+  RestaurantMenu: { restaurant: any };
+  OrderHistory: undefined;
+};
 
 interface MenuItem {
   id: string;
@@ -20,7 +28,7 @@ const menuItems: MenuItem[] = [
 
 export default function RestaurantMenuScreen() {
   const route = useRoute();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { restaurant } = route.params as any;
   
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
@@ -92,6 +100,21 @@ export default function RestaurantMenuScreen() {
 
   return (
     <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Image
+          source={require('../../../assets/Images/AppLogoV1.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.logoutText}>LOG OUT</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           <Text style={styles.pageTitle}>RESTAURANT MENU</Text>
@@ -154,6 +177,28 @@ export default function RestaurantMenuScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('Restaurants')}
+        >
+          <View style={styles.navIcon}>
+            <Text style={styles.navIconText}>🍔</Text>
+          </View>
+          <Text style={styles.navLabel}>Restaurants</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('OrderHistory')}
+        >
+          <View style={styles.navIcon}>
+            <Text style={styles.navIconText}>🕐</Text>
+          </View>
+          <Text style={styles.navLabel}>OrderHistory</Text>
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={showOrderModal}
@@ -252,8 +297,33 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  logo: {
+    width: 150,
+    height: 40,
+  },
+  logoutButton: {
+    backgroundColor: '#d9534f',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 6,
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   content: {
     padding: 20,
@@ -521,5 +591,37 @@ const styles = StyleSheet.create({
     color: '#d9534f',
     textAlign: 'center',
     fontWeight: '600',
+  },
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingVertical: 8,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  navIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  navIconText: {
+    fontSize: 20,
+  },
+  navLabel: {
+    fontSize: 12,
+    color: '#666',
   },
 });
