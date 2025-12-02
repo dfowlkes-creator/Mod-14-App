@@ -395,6 +395,69 @@ Updated the code to force failures by default for testing. Just change that one 
 
 ---
 
+## ✏️ Prompt - 15
+
+**📎 Context:** Adding keyboard submit functionality to login form for better user experience.
+
+I would like for the user to be able to login by clicking on the login button as well as by hitting enter on the keyboard. How would I accomplish that?
+
+## 🤖 Response - 15
+
+Added keyboard submit functionality to the password TextInput in LoginScreen.tsx:
+
+- Added `onSubmitEditing={handleLogin}` prop to password field - triggers login when Enter/Return is pressed
+- Added `returnKeyType="go"` prop - changes keyboard's return key to show "Go" instead of "Return", giving users a visual cue that pressing it will submit the form
+
+Users can now login by either:
+
+- Clicking the "Login" button
+- Pressing Enter/Return on their keyboard after typing their password
+
+---
+
+## ✏️ Prompt - 16
+
+**📎 Context:** Updating restaurant filter buttons to match wireframe display format with stars and dropdown indicators.
+
+Compare the screenshots. The first is the current layout of the filters upon selection. The second is the wireframe of how the selected filters should look. I want the current layout to mirror the wireframe exactly how it is in the screenshot. The rating filter selection should display the number of stars instead of the string "4 Stars". There should also be a small arrow facing downward so that the user is aware that they can click on the filter to make their selections.
+
+## 🤖 Response - 16
+
+Updated RestaurantsScreen filter buttons to match wireframe exactly:
+
+**Changes made:**
+
+1. **Rating filter** - Now displays stars (★★★★) using `renderStars(selectedRating)` instead of "4 Stars" text when a rating is selected
+2. **Dropdown arrows** - Added small downward-facing arrow (▼) to both filter buttons so users know they're clickable dropdowns
+3. **Button layout** - Changed filter buttons to use `flexDirection: 'row'` to properly position the text and arrow side-by-side
+4. **Arrow styling** - Added `dropdownArrow` style with white color, 10px font size, and 8px left margin
+
+The filters now display exactly like the wireframe with visual star ratings and dropdown indicators for better UX.
+
+---
+
+## ✏️ Prompt - 17
+
+**📎 Context:** Reverting price filter default value after accidental change.
+
+The default for the price filter should've remained the same. Please change that back. I just needed the dropdown arrow added to that.
+
+## 🤖 Response - 17
+
+Reverted price filter default back to "-- Select --" (from "$"). The price filter now shows:
+
+- "-- Select --" when no price is selected (default state)
+- Selected price value (e.g., "$", "$$", "$$$") when a filter is applied
+- Dropdown arrow (▼) always visible to indicate it's clickable
+
+Only the dropdown arrow was added to the price filter; the default placeholder text remained unchanged.
+
+- Currently set to `false` to always fail
+- Change to `true` to always succeed
+- Change to `Math.random() > 0.3` for realistic random success/failure
+
+---
+
 ## ✏️ Prompt - 05
 
 **📎 Context:** Write what you were working on here

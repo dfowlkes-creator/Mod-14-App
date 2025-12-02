@@ -5,10 +5,12 @@ type RootStackParamList = {
   Details: undefined;
   Restaurants: undefined;
   RestaurantMenu: { restaurant: any };
+  OrderHistory: undefined;
 };
 import LoginScreen from './navigation/screens/LoginScreen';
 import RestaurantsScreen from './navigation/screens/RestaurantsScreen';
 import RestaurantMenuScreen from './navigation/screens/RestaurantMenuScreen';
+import OrderHistoryScreen from './navigation/screens/OrderHistoryScreen';
 
 import * as React from 'react';
 import { View, Text } from 'react-native';
@@ -52,6 +54,7 @@ export default function App() {
         <Stack.Screen name="Details" component={DetailsScreen} />
         <Stack.Screen name="Restaurants" component={RestaurantsScreen} options={{ title: 'Restaurants' }} />
         <Stack.Screen name="RestaurantMenu" component={RestaurantMenuScreen} options={{ title: 'Menu' }} />
+        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'Order History' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

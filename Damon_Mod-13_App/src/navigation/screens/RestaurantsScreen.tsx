@@ -9,6 +9,7 @@ type RootStackParamList = {
   Details: undefined;
   Restaurants: undefined;
   RestaurantMenu: { restaurant: any };
+  OrderHistory: undefined;
 };
 
 const restaurants = [
@@ -228,12 +229,15 @@ export default function RestaurantsScreen() {
 
       <View style={styles.bottomNav}>
         <TouchableOpacity style={styles.navItem}>
-          <View style={styles.navIcon}>
+          <View style={[styles.navIcon, styles.navIconActive]}>
             <Text style={styles.navIconText}>🍔</Text>
           </View>
           <Text style={styles.navLabel}>Restaurants</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate('OrderHistory')}
+        >
           <View style={styles.navIcon}>
             <Text style={styles.navIconText}>🕐</Text>
           </View>
@@ -389,6 +393,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
+  },
+  navIconActive: {
+    backgroundColor: '#e0e0e0',
   },
   navIconText: {
     fontSize: 20,
