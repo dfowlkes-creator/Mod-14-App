@@ -68,6 +68,8 @@ export default function LoginScreen() {
           }}
           secureTextEntry
           placeholderTextColor="#999"
+          onSubmitEditing={handleLogin}
+          returnKeyType="go"
         />
         
         {error ? <Text style={styles.error}>{error}</Text> : null}

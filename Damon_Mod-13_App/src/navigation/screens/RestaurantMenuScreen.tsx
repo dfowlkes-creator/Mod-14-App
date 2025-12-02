@@ -73,7 +73,7 @@ export default function RestaurantMenuScreen() {
     
     // Simulate API call
     setTimeout(() => {
-      const success = false; // Change to true for success, false for failure, or Math.random() > 0.3 for 70% success rate
+      const success = true; // Change to true for success, false for failure, or Math.random() > 0.3 for 70% success rate
       setOrderStatus(success ? 'success' : 'failure');
     }, 2000);
   };

@@ -14,30 +14,30 @@ type RootStackParamList = {
 const restaurants = [
   {
     id: '1',
-    name: 'Golden Bar & Grill ($$)',
+    name: 'Golden Bar & Grill ($$$)',
     image: require('../../../assets/Images/Restaurants/cuisineGreek.jpg'),
-    rating: 4,
-    price: '$$',
+    rating: 5,
+    price: '$$$',
   },
   {
     id: '2',
-    name: 'WJU Eats ($$)',
+    name: 'WJU Eats ($)',
     image: require('../../../assets/Images/Restaurants/cuisineJapanese.jpg'),
-    rating: 4,
-    price: '$$',
+    rating: 3,
+    price: '$',
   },
   {
     id: '3',
-    name: 'Sweet Dragon ($)',
+    name: 'Sweet Dragon ($$)',
     image: require('../../../assets/Images/Restaurants/cuisineSoutheast.jpg'),
     rating: 4,
-    price: '$',
+    price: '$$',
   },
   {
     id: '4',
     name: 'Golden Creamery ($)',
     image: require('../../../assets/Images/Restaurants/cuisineViet.jpg'),
-    rating: 4,
+    rating: 3,
     price: '$',
   },
   {
@@ -49,10 +49,10 @@ const restaurants = [
   },
   {
     id: '6',
-    name: 'Pasta House ($$)',
+    name: 'Pasta House ($$$)',
     image: require('../../../assets/Images/Restaurants/cuisinePasta.jpg'),
-    rating: 4,
-    price: '$$',
+    rating: 5,
+    price: '$$$',
   },
 ];
 
@@ -104,8 +104,9 @@ export default function RestaurantsScreen() {
             onPress={() => setShowRatingModal(true)}
           >
             <Text style={styles.filterButtonText}>
-              {selectedRating ? `${selectedRating} Stars` : '-- Select --'}
+              {selectedRating ? renderStars(selectedRating) : '-- Select --'}
             </Text>
+            <Text style={styles.dropdownArrow}>▼</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.filterColumn}>
@@ -117,6 +118,7 @@ export default function RestaurantsScreen() {
             <Text style={styles.filterButtonText}>
               {selectedPrice || '-- Select --'}
             </Text>
+            <Text style={styles.dropdownArrow}>▼</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -302,12 +304,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 6,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   filterButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '500',
+  },
+  dropdownArrow: {
+    color: '#fff',
+    fontSize: 10,
+    marginLeft: 8,
   },
   restaurantsTitleSection: {
     paddingHorizontal: 16,
