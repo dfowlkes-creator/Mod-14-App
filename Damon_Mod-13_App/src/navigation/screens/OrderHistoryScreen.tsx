@@ -121,7 +121,10 @@ export default function OrderHistoryScreen() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={() => navigation.navigate('Login')}
+        >
           <Text style={styles.logoutText}>LOG OUT</Text>
         </TouchableOpacity>
       </View>
