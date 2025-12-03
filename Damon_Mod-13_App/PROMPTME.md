@@ -585,7 +585,7 @@ Completely redesigned LoginScreen to match wireframe exactly:
 - "Login to begin" as subtitle (16px, gray)
 - "Email" and "Password" labels above input fields (14px, bold, dark gray)
 - Updated placeholder text: "Enter your primary email here" for email
-- Updated placeholder text: "****\*\*\*\*****" for password
+- Updated placeholder text: "\***\*\*\*\*\*\*\***" for password
 - "LOG IN" button with all caps text, letter spacing, and rusty orange color (#c9654f)
 
 **Removed elements:**
@@ -601,27 +601,259 @@ Completely redesigned LoginScreen to match wireframe exactly:
 
 ---
 
-## ✏️ Prompt - 06
+## ✏️ Prompt - 22
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Investigating backend database structure to understand how restaurant ratings are calculated and stored.
 
-Paste your prompt or question here
+Which database table contains the restaurant ratings?
 
-## 🤖 Response - 06
+## 🤖 Response - 22
 
-Paste the AI's answer here
+Restaurant ratings are stored in the **`orders`** table in the **`restaurant_rating`** column.
+
+The rating displayed for each restaurant is calculated as the **average** of all `restaurant_rating` values from completed orders for that restaurant. The backend uses this SQL query:
+
+```sql
+COALESCE(CEIL(SUM(o.restaurant_rating) / NULLIF(COUNT(o.id), 0)), 0) AS rating
+FROM restaurants r
+LEFT JOIN orders o ON r.id = o.restaurant_id
+```
+
+**How it works:**
+
+- Individual customers rate their order experience (1-5 stars)
+- Each rating is stored in `orders.restaurant_rating`
+- The restaurant's overall rating is the ceiling of the average of all order ratings
+- This aggregate rating is calculated dynamically via JOIN queries in `RestaurantRepository`
+
+**Key files:**
+
+- `serverJAVA/src/main/java/com/rocketFoodDelivery/rocketFood/repository/RestaurantRepository.java` - Contains the rating calculation queries
+- `serverJAVA/src/main/java/com/rocketFoodDelivery/rocketFood/service/RestaurantService.java` - Processes the rating data and rounds up to nearest integer
 
 ---
 
-## ✏️ Prompt - 07
+## ✏️ Prompt - 23
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Understanding deployment options and testing methods for the React Native Expo app on physical mobile devices
 
-Paste your prompt or question here
+How do I setup this project on Expo Go for my phone?
 
-## 🤖 Response - 07
+## 🤖 Response - 23
 
-Paste the AI's answer here
+**This app cannot run on Expo Go.** The project uses **Expo Development Builds** with custom native code (`expo-dev-client`), which is incompatible with Expo Go.
+
+**Why it won't work:**
+
+- Project requires custom native modules and compilation
+- README explicitly states: "This project uses a development build and cannot be run with Expo Go"
+- Uses features requiring native code modifications
+
+**Options to run on your phone:**
+
+### Option 1: Build Development Build with EAS (Recommended)
+
+```bash
+# Install EAS CLI
+npm install -g eas-cli
+
+# Login to Expo
+eas login
+
+# Build for your device
+eas build --profile development --platform ios    # For iPhone
+eas build --profile development --platform android # For Android
+
+# Install the build on your device from the download link provided
+```
+
+### Option 2: Test via Web Browser
+
+```bash
+npm start        # Start dev server
+# Press 'w' for web
+# Visit http://[YOUR_IP]:8081 on phone's browser
+```
+
+### Option 3: Local Native Build (Advanced)
+
+```bash
+npm run android  # Requires Android Studio + emulator/device
+npm run ios      # Requires Xcode (Mac only) + simulator/device
+```
+
+**Important considerations:**
+
+- Backend must be accessible at `http://10.0.0.200:8080` (update IP in `src/services/api.ts` for your network)
+- Development builds install like regular apps and persist on device
+- EAS builds are cloud-based and don't require local Android Studio/Xcode setup
+
+---
+
+## ✏️ Prompt - 24
+
+**📎 Context:** Understanding what ngrok is and checking if it's mentioned in the project.
+
+what is ngrok and is there any mention of it anywhere within this project?
+
+## 🤖 Response - 24
+
+**What is ngrok:**
+
+ngrok is a tool that creates secure tunnels from public URLs to your local machine. It's commonly used in development to:
+
+1. **Expose local servers** - Makes your localhost accessible from the internet with a public URL
+2. **Test webhooks** - Allows external services to send webhooks to your local development environment
+3. **Demo applications** - Share your local app with clients/team members without deploying
+4. **Mobile app development** - Test mobile apps against your local backend server
+
+For example, if you're running a server on `localhost:8080`, ngrok can give you a URL like `https://abc123.ngrok.io` that forwards to your local server.
+
+**In your project:**
+
+There are **no mentions of ngrok** anywhere in your project files.
+
+Given that you have a React Native mobile app (in `Damon_Mod-13_App`) and a Java Spring Boot backend (in both `serverJAVA` and `Module-12`), ngrok could be useful if you need to test your mobile app on a physical device against your local backend server, since the device would need a publicly accessible URL to connect to.
+
+---
+
+## ✏️ Prompt - 25
+
+**📎 Context:** Understanding how to incorporate ngrok into the React Native and Java Spring Boot project.
+
+How would I incorporate ngrok into my project?
+
+## 🤖 Response - 25
+
+**Step-by-Step ngrok Integration:**
+
+### 1. **Install ngrok**
+
+```bash
+# Using Homebrew (recommended for macOS)
+brew install ngrok/ngrok/ngrok
+```
+
+### 2. **Sign up and authenticate** (optional but recommended)
+
+```bash
+ngrok config add-authtoken YOUR_AUTH_TOKEN
+```
+
+### 3. **Start your Java backend**
+
+```bash
+cd /Users/dfowlkes/CodeBoxx/Mod-13-App/Damon_Mod-13_App/serverJAVA
+./mvnw spring-boot:run
+```
+
+### 4. **Start ngrok tunnel** (in a new terminal)
+
+```bash
+ngrok http 8080
+```
+
+You'll see output like:
+
+```
+Forwarding    https://abc123xyz.ngrok.io -> http://localhost:8080
+```
+
+### 5. **Update your React Native app configuration**
+
+Updated `src/services/api.ts` to make it easy to switch between local and ngrok:
+
+```typescript
+const USE_NGROK = false; // Set to true when using ngrok
+const NGROK_URL = "https://your-ngrok-url.ngrok.io"; // Replace with actual ngrok URL
+const LOCAL_IP = "http://10.0.0.200:8080"; // Your machine's local IP
+
+const API_BASE_URL = USE_NGROK ? NGROK_URL : LOCAL_IP;
+```
+
+### 6. **CORS Configuration**
+
+Your backend already has CORS configured to accept all origins (`*`), so ngrok will work without additional backend changes.
+
+**Daily Development Workflow:**
+
+1. **Terminal 1** - Start backend: `./mvnw spring-boot:run`
+2. **Terminal 2** - Start ngrok: `ngrok http 8080`
+3. Copy the ngrok URL and update `api.ts` with `USE_NGROK = true` and paste the URL
+4. **Terminal 3** - Run React Native app: `npm start`
+
+**When to Use:**
+
+- **ngrok**: Testing on physical devices not on same Wi-Fi, remote testing, firewall restrictions
+- **Local IP**: Same Wi-Fi network testing, faster development, no internet latency
+
+**Pro Tips:**
+
+- Visit `http://127.0.0.1:4040` to inspect HTTP requests in real-time
+- Free ngrok URLs change each restart (static URLs are paid feature)
+- Keep ngrok terminal open while developing
+
+---
+
+## ✏️ Prompt - 26
+
+**📎 Context:** Clarifying the relationship between ngrok, MySQL, and the difference from Chrome DevTools.
+
+So, ngrok will be working in addition to MySQL? Ngrok is basically a developer tool to see how the app would look on a device such as a cell phone or tablet? Just like when using Chrome dev tools.
+
+## 🤖 Response - 26
+
+Not quite! ngrok is fundamentally different from Chrome DevTools.
+
+**What ngrok Does:**
+
+ngrok creates a **public internet tunnel** to your LOCAL backend server.
+
+In your case:
+
+- Your **Java Spring Boot backend** runs on `localhost:8080` (only accessible on your Mac)
+- **ngrok** creates a public URL like `https://abc123xyz.ngrok.io` that forwards to your `localhost:8080`
+- Your **React Native app** on your phone can now reach your backend through this public URL
+
+**The Problem ngrok Solves:**
+
+When you test your React Native app on a **physical device**:
+
+- The phone **cannot access** `localhost:8080` (that's only on your computer)
+- The phone **might not reach** `http://10.0.0.200:8080` if on different network or has firewall issues
+- The phone **CAN access** `https://abc123xyz.ngrok.io` because it's a public internet URL
+
+**The Full Stack:**
+
+```
+[Your Phone]
+    ↓ HTTP requests via internet
+[ngrok public URL: https://abc123xyz.ngrok.io]
+    ↓ tunnels through internet
+[ngrok on your Mac]
+    ↓ forwards to localhost
+[Java Spring Boot on localhost:8080]
+    ↓ SQL queries
+[MySQL Database on localhost:3306]
+```
+
+**Yes, ngrok works WITH MySQL** - they're in the same stack:
+
+- MySQL stores your data
+- Java backend queries MySQL
+- ngrok exposes your Java backend to the internet
+- Your phone app talks to the backend through ngrok
+
+**Chrome DevTools Equivalent:**
+
+For **viewing** your React Native app, you'd use:
+
+- **React Native Debugger**
+- **Expo DevTools**
+- **Chrome DevTools** (for debugging JavaScript)
+- **iOS Simulator / Android Emulator**
+
+ngrok is specifically for **networking** - making your local backend accessible to remote devices.
 
 ---
 

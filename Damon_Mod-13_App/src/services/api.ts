@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 // Configure your backend base URL
-// Use local IP for mobile devices/simulators, localhost for web
-const API_BASE_URL = 'http://10.0.0.200:8080'; // Your machine's local IP
+const API_BASE_URL = 'http://10.0.0.200:8080';
+
+console.log('📡 API Base URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,

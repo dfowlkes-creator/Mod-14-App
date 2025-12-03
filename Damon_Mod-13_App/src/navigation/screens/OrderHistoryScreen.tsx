@@ -165,7 +165,12 @@ export default function OrderHistoryScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{selectedOrder?.restaurantName}</Text>
+              <View style={styles.modalHeaderContent}>
+                <Text style={styles.modalTitle}>{selectedOrder?.restaurantName}</Text>
+                <Text style={styles.orderInfoText}>Order Date: {selectedOrder?.orderDate}</Text>
+                <Text style={styles.orderInfoText}>Status: {selectedOrder?.status}</Text>
+                <Text style={styles.orderInfoText}>Courrier: {selectedOrder?.courrier}</Text>
+              </View>
               <TouchableOpacity 
                 onPress={() => setShowDetailModal(false)}
                 style={styles.closeButton}
@@ -175,12 +180,6 @@ export default function OrderHistoryScreen() {
             </View>
             
             <ScrollView style={styles.modalBody}>
-              <View style={styles.orderInfo}>
-                <Text style={styles.orderInfoText}>Order Date: {selectedOrder?.orderDate}</Text>
-                <Text style={styles.orderInfoText}>Status: {selectedOrder?.status}</Text>
-                <Text style={styles.orderInfoText}>Courrier: {selectedOrder?.courrier}</Text>
-              </View>
-
               <View style={styles.itemsContainer}>
                 {selectedOrder?.items.map((item, index) => (
                   <View key={index} style={styles.orderItem}>
@@ -360,16 +359,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
+  modalHeaderContent: {
+    flex: 1,
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#d9534f',
+    marginBottom: 12,
   },
   closeButton: {
     padding: 4,
@@ -382,13 +385,10 @@ const styles = StyleSheet.create({
   modalBody: {
     padding: 24,
   },
-  orderInfo: {
-    marginBottom: 20,
-  },
   orderInfoText: {
     fontSize: 14,
-    color: '#333',
-    marginBottom: 8,
+    color: '#fff',
+    marginBottom: 4,
   },
   itemsContainer: {
     marginBottom: 16,
