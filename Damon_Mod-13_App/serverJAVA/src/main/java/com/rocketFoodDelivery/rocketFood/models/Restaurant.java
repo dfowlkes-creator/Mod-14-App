@@ -46,6 +46,6 @@ public class Restaurant {
     private String email;
 
     @Column
-    private Boolean active;
+    private boolean active;
 
 }

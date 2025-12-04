@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configure your backend base URL
 //const API_BASE_URL = 'http://10.0.0.200:8080';
-const API_BASE_URL = 'https://answeringly-sturty-dinah.ngrok-free.dev';
+const API_BASE_URL = 'http://10.0.0.200:8080';
 
 
 console.log('📡 API Base URL:', API_BASE_URL);

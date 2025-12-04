@@ -13,12 +13,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ApiRestaurantDto {
     int id;
-    
+
     String name;
 
     @JsonProperty("price_range")
     int priceRange;
 
     int rating;
+
+    @JsonProperty("active")
     private boolean active;
 }

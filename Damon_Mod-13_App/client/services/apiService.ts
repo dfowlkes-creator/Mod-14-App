@@ -1,11 +1,15 @@
 import api from './api';
 
-interface AuthRequest {
+//
+// Types
+//
+
+export interface AuthRequest {
   email: string;
   password: string;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   success: boolean;
   accessToken?: string;
   user_id?: number;
@@ -13,20 +17,21 @@ interface AuthResponse {
   courier_id?: number;
 }
 
-interface Restaurant {
+export interface Restaurant {
   id: number;
   name: string;
   rating: number;
   price_range: number;
+  active: boolean;
 }
 
-interface Product {
+export interface Product {
   id: number;
   name: string;
   cost: number;
 }
 
-interface CreateOrderRequest {
+export interface CreateOrderRequest {
   customer_id: number;
   restaurant_id: number;
   address_id: number;
@@ -36,7 +41,7 @@ interface CreateOrderRequest {
   }>;
 }
 
-interface Order {
+export interface Order {
   id: number;
   customer_id: number;
   customer_name: string;
@@ -56,30 +61,64 @@ interface Order {
   total_cost: number;
 }
 
+//
+// Services
+//
+
 export const authService = {
   login: async (credentials: AuthRequest): Promise<AuthResponse> => {
+    console.log('🔐 POST to: /api/auth');
+
     const response = await api.post('/api/auth', credentials);
-    if (response.data.accessToken) {
-      global.authToken = response.data.accessToken;
+
+    // The backend might send success as boolean or string — normalize here.
+    const raw: any = response.data;
+
+    const success: boolean =
+      typeof raw.success === 'string'
+        ? raw.success === 'true'
+        : !!raw.success;
+
+    const normalized: AuthResponse = {
+      ...raw,
+      success,
+    };
+
+    if (normalized.accessToken) {
+      // Store token globally
+      (global as any).authToken = normalized.accessToken;
+
+      // And on the axios instance for subsequent requests
+      const anyApi = api as any;
+      if (anyApi.defaults && anyApi.defaults.headers) {
+        anyApi.defaults.headers.common =
+          anyApi.defaults.headers.common || {};
+        anyApi.defaults.headers.common['Authorization'] =
+          `Bearer ${normalized.accessToken}`;
+      }
     }
-    return response.data;
+
+    return normalized;
   },
 };
 
 export const restaurantService = {
-  getAll: async (rating?: number, priceRange?: number): Promise<Restaurant[]> => {
-    const params: any = {};
+  getAll: async (
+    rating?: number,
+    priceRange?: number
+  ): Promise<Restaurant[]> => {
+    const params: Record<string, number> = {};
     if (rating) params.rating = rating;
     if (priceRange) params.price_range = priceRange;
-    
+
     const response = await api.get('/api/restaurants', { params });
-    // Backend returns { message: "Success", data: [...] }
-    return response.data.data || response.data;
+    // Backend returns { message: "Success", data: [...] } or just [...]
+    return response.data.data ?? response.data;
   },
-  
+
   getById: async (id: number): Promise<Restaurant> => {
     const response = await api.get(`/api/restaurants/${id}`);
-    return response.data.data || response.data;
+    return response.data.data ?? response.data;
   },
 };
 
@@ -97,15 +136,18 @@ export const orderService = {
     const response = await api.post('/api/orders', orderData);
     return response.data;
   },
-  
+
   getCustomerOrders: async (customerId: number): Promise<Order[]> => {
     const response = await api.get('/api/orders', {
       params: { type: 'customer', id: customerId },
     });
     return response.data;
   },
-  
-  updateStatus: async (orderId: number, status: string): Promise<{ status: string }> => {
+
+  updateStatus: async (
+    orderId: number,
+    status: string
+  ): Promise<{ status: string }> => {
     const response = await api.post(`/api/order/${orderId}/status`, { status });
     return response.data;
   },

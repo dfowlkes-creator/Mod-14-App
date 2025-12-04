@@ -18,6 +18,7 @@ interface Restaurant {
   name: string;
   rating: number;
   price_range: number;
+  active: boolean;
 }
 
 const restaurantImages: { [key: string]: any } = {

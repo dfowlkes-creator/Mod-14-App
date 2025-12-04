@@ -38,28 +38,29 @@ public class AuthController {
     @Autowired
     AuthenticationManager authManager;
 
-    public AuthController(CourierRepository courierRepository, CustomerRepository customerRepository, UserRepository userRepository){
+    public AuthController(CourierRepository courierRepository, CustomerRepository customerRepository,
+            UserRepository userRepository) {
         this.courierRepository = courierRepository;
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
     }
 
     @PostMapping("/api/auth")
-    public ResponseEntity<?> authenticate(@RequestBody @Valid AuthRequestDto request){
+    public ResponseEntity<?> authenticate(@RequestBody @Valid AuthRequestDto request) {
         try {
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            request.getEmail(), request.getPassword())
-            );
+                            request.getEmail(), request.getPassword()));
             UserEntity user = (UserEntity) authentication.getPrincipal();
             Optional<Courier> courier = courierRepository.findByUserEntityId(user.getId());
             Optional<Customer> customer = customerRepository.findByUserEntityId(user.getId());
 
             AuthResponseSuccessDTO response = new AuthResponseSuccessDTO();
-            if(courier.isPresent()){
+            response.setSuccess(true);
+            if (courier.isPresent()) {
                 response.setCourier_id(courier.get().getId());
             }
-            if (customer.isPresent()){
+            if (customer.isPresent()) {
                 response.setCustomer_id(customer.get().getId());
             }
             response.setSuccess(true);
@@ -88,21 +89,19 @@ public class AuthController {
         Optional<Courier> courierOptional = courierRepository.findByUserEntityId(id);
 
         AccountResponseDTO response = new AccountResponseDTO(
-            primaryEmail,
-            customerOptional.map(Customer::getEmail).orElse(null),
-            customerOptional.map(Customer::getPhone).orElse(null),
-            courierOptional.map(Courier::getEmail).orElse(null),
-            courierOptional.map(Courier::getPhone).orElse(null)
-        );
+                primaryEmail,
+                customerOptional.map(Customer::getEmail).orElse(null),
+                customerOptional.map(Customer::getPhone).orElse(null),
+                courierOptional.map(Courier::getEmail).orElse(null),
+                courierOptional.map(Courier::getPhone).orElse(null));
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/api/account/{id}")
     public ResponseEntity<?> updateAccount(
-        @PathVariable int id,
-        @RequestBody AccountUpdateDTO accountUpdateDTO
-    ) {
+            @PathVariable int id,
+            @RequestBody AccountUpdateDTO accountUpdateDTO) {
         Optional<UserEntity> userOptional = userRepository.findById(id);
 
         if (!userOptional.isPresent()) {
