@@ -73,7 +73,7 @@ export default function LoginScreen() {
             }}
             autoCapitalize="none"
             keyboardType="email-address"
-            placeholderTextColor="#999"
+            placeholderTextColor="#888"
           />
           
           <Text style={styles.label}>Password</Text>
@@ -86,7 +86,7 @@ export default function LoginScreen() {
               setError('');
             }}
             secureTextEntry
-            placeholderTextColor="#999"
+            placeholderTextColor="#888"
             onSubmitEditing={handleLogin}
             returnKeyType="go"
           />
@@ -113,7 +113,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
@@ -129,10 +129,10 @@ const styles = StyleSheet.create({
   loginCard: {
     width: '100%',
     maxWidth: 400,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#DDDDDD',
     padding: 32,
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
     elevation: 3,
@@ -143,12 +143,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#666666',
   },
   form: {
     width: '100%',
@@ -156,39 +156,39 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 8,
   },
   input: {
     height: 50,
-    borderColor: '#ddd',
+    borderColor: '#DDDDDD',
     borderWidth: 1,
     borderRadius: 6,
     paddingHorizontal: 16,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: '#fff',
-    color: '#333',
+    backgroundColor: '#FFFFFF',
+    color: '#222126',
   },
   error: {
-    color: '#d32f2f',
+    color: '#B51919',
     marginBottom: 16,
     textAlign: 'center',
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#c9654f',
+    backgroundColor: '#B51919',
     borderRadius: 6,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#CCCCCC',
     opacity: 0.7,
   },
   buttonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
     letterSpacing: 1,

@@ -47,14 +47,14 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Login"
-        screenOptions={{ headerStyle: { backgroundColor: 'tomato' } }}
+        screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }} />
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Overview' }} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Details" component={DetailsScreen} />
-        <Stack.Screen name="Restaurants" component={RestaurantsScreen} options={{ title: 'Restaurants' }} />
-        <Stack.Screen name="RestaurantMenu" component={RestaurantMenuScreen} options={{ title: 'Menu' }} />
-        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} options={{ title: 'Order History' }} />
+        <Stack.Screen name="Restaurants" component={RestaurantsScreen} />
+        <Stack.Screen name="RestaurantMenu" component={RestaurantMenuScreen} />
+        <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

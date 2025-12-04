@@ -121,7 +121,7 @@ export default function OrderHistoryScreen() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#d9534f" />
+            <ActivityIndicator size="large" color="#B51919" />
             <Text style={styles.loadingText}>Loading orders...</Text>
           </View>
         ) : error ? (
@@ -225,7 +225,7 @@ export default function OrderHistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -233,22 +233,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
   },
   logo: {
     width: 150,
     height: 40,
   },
   logoutButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 6,
   },
   logoutText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -259,25 +259,25 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginBottom: 20,
   },
   tableContainer: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#E0E0E0',
     borderRadius: 8,
     overflow: 'hidden',
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#333',
+    backgroundColor: '#222126',
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
   tableHeaderText: {
     flex: 1,
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -290,13 +290,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
     alignItems: 'center',
   },
   tableCell: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
+    color: '#222126',
     textAlign: 'center',
   },
   viewButton: {
@@ -312,9 +312,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
     paddingVertical: 8,
   },
   navItem: {
@@ -326,20 +326,20 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
   },
   navIconActive: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#E0E0E0',
   },
   navIconText: {
     fontSize: 20,
   },
   navLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#666666',
   },
   modalOverlay: {
     flex: 1,
@@ -349,14 +349,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     width: '100%',
     maxWidth: 400,
     maxHeight: '80%',
   },
   modalHeader: {
-    backgroundColor: '#333',
+    backgroundColor: '#222126',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#d9534f',
+    color: '#B51919',
     marginBottom: 12,
   },
   closeButton: {
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     fontSize: 24,
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '300',
   },
   modalBody: {
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
   },
   orderInfoText: {
     fontSize: 14,
-    color: '#fff',
+    color: '#FFFFFF',
     marginBottom: 4,
   },
   itemsContainer: {
@@ -401,18 +401,18 @@ const styles = StyleSheet.create({
   },
   orderItemName: {
     fontSize: 14,
-    color: '#333',
+    color: '#222126',
     flex: 1,
   },
   orderItemQuantity: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     marginHorizontal: 12,
   },
   orderItemPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     minWidth: 60,
     textAlign: 'right',
   },
@@ -423,18 +423,18 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginRight: 16,
   },
   totalPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
   },
   loadingContainer: {
     flex: 1,
@@ -444,7 +444,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: '#666666',
   },
   errorContainer: {
     flex: 1,
@@ -453,17 +453,17 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#d9534f',
+    color: '#B51919',
     marginBottom: 16,
   },
   retryButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 6,
   },
   retryButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -475,11 +475,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
   },
 });

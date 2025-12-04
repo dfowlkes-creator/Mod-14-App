@@ -15,6 +15,7 @@ interface MenuItem {
   id: number;
   name: string;
   cost: number;
+  description?: string;
 }
 
 export default function RestaurantMenuScreen() {
@@ -143,8 +144,6 @@ export default function RestaurantMenuScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.pageTitle}>RESTAURANT MENU</Text>
-          
           <View style={styles.headerSection}>
             <View style={styles.restaurantInfo}>
               <Text style={styles.restaurantName}>{restaurant.name}</Text>
@@ -170,7 +169,7 @@ export default function RestaurantMenuScreen() {
           
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#d9534f" />
+              <ActivityIndicator size="large" color="#B51919" />
               <Text style={styles.loadingText}>Loading menu...</Text>
             </View>
           ) : error ? (
@@ -192,6 +191,9 @@ export default function RestaurantMenuScreen() {
                   <View style={styles.menuItemInfo}>
                     <Text style={styles.menuItemName}>{item.name}</Text>
                     <Text style={styles.menuItemPrice}>${item.cost.toFixed(2)}</Text>
+                    <Text style={styles.menuItemDescription}>
+                      {item.description || 'Delicious menu item'}
+                    </Text>
                   </View>
                   
                   <View style={styles.quantityControls}>
@@ -335,7 +337,7 @@ export default function RestaurantMenuScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -343,22 +345,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
   },
   logo: {
     width: 150,
     height: 40,
   },
   logoutButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 6,
   },
   logoutText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -367,13 +369,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-  },
-  pageTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 16,
-    letterSpacing: 0.5,
   },
   headerSection: {
     flexDirection: 'row',
@@ -388,17 +383,17 @@ const styles = StyleSheet.create({
   restaurantName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginBottom: 4,
   },
   priceIndicator: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     marginBottom: 4,
   },
   stars: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
   },
   menuSection: {
     marginTop: 20,
@@ -409,7 +404,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
   },
   menuItemImage: {
     width: 80,
@@ -424,13 +419,18 @@ const styles = StyleSheet.create({
   menuItemName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 4,
   },
   menuItemPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#d9534f',
+    color: '#222126',
+  },
+  menuItemDescription: {
+    fontSize: 14,
+    color: '#666666',
+    marginTop: 4,
   },
   quantityControls: {
     flexDirection: 'row',
@@ -441,24 +441,24 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#d9534f',
+    backgroundColor: '#222126',
     justifyContent: 'center',
     alignItems: 'center',
   },
   quantityButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 20,
     fontWeight: 'bold',
   },
   quantityText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     minWidth: 30,
     textAlign: 'center',
   },
   createOrderButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -466,15 +466,15 @@ const styles = StyleSheet.create({
     minWidth: 120,
   },
   createOrderButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#CCCCCC',
   },
   createOrderButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
   createOrderButtonTextDisabled: {
-    color: '#999',
+    color: '#888888',
   },
   modalOverlay: {
     flex: 1,
@@ -484,13 +484,13 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     width: '100%',
     maxWidth: 400,
   },
   modalHeader: {
-    backgroundColor: '#333',
+    backgroundColor: '#222126',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -502,14 +502,14 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#FFFFFF',
   },
   closeButton: {
     padding: 4,
   },
   closeButtonText: {
     fontSize: 24,
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '300',
   },
   modalBody: {
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   orderSummaryTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginBottom: 16,
   },
   orderItem: {
@@ -529,18 +529,18 @@ const styles = StyleSheet.create({
   },
   orderItemName: {
     fontSize: 14,
-    color: '#333',
+    color: '#222126',
     flex: 1,
   },
   orderItemQuantity: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     marginHorizontal: 12,
   },
   orderItemPrice: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     minWidth: 60,
     textAlign: 'right',
   },
@@ -551,21 +551,21 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
   },
   totalLabel: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginRight: 16,
   },
   totalPrice: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
   },
   confirmButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     marginHorizontal: 24,
     marginBottom: 24,
     paddingVertical: 14,
@@ -573,11 +573,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#CCCCCC',
     opacity: 0.7,
   },
   confirmButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: 'bold',
     letterSpacing: 0.5,
@@ -589,14 +589,14 @@ const styles = StyleSheet.create({
   },
   processingText: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
     fontStyle: 'italic',
   },
   successIcon: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#5cb85c',
+    backgroundColor: '#609475',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -605,25 +605,25 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   iconText: {
     fontSize: 36,
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
   successText: {
     fontSize: 14,
-    color: '#5cb85c',
+    color: '#609475',
     textAlign: 'center',
     fontWeight: '600',
   },
   failureText: {
     fontSize: 14,
-    color: '#d9534f',
+    color: '#B51919',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: '#666666',
   },
   errorContainer: {
     paddingVertical: 40,
@@ -642,7 +642,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#d9534f',
+    color: '#B51919',
     textAlign: 'center',
   },
   emptyContainer: {
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#666',
+    color: '#666666',
   },
   bottomNav: {
     position: 'absolute',
@@ -659,9 +659,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
     paddingVertical: 8,
   },
   navItem: {
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
@@ -683,6 +683,6 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#666666',
   },
 });

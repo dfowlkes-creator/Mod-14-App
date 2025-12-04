@@ -29,6 +29,7 @@ export interface Product {
   id: number;
   name: string;
   cost: number;
+  description?: string;
 }
 
 export interface CreateOrderRequest {

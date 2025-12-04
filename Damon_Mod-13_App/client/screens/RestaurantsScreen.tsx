@@ -141,7 +141,7 @@ export default function RestaurantsScreen() {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#d9534f" />
+          <ActivityIndicator size="large" color="#B51919" />
           <Text style={styles.loadingText}>Loading restaurants...</Text>
         </View>
       ) : error ? (
@@ -282,7 +282,7 @@ export default function RestaurantsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     flexDirection: 'row',
@@ -290,22 +290,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
   },
   logo: {
     width: 150,
     height: 40,
   },
   logoutButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 6,
   },
   logoutText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
   },
   filterSection: {
     flexDirection: 'row',
@@ -331,11 +331,11 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 8,
   },
   filterButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 6,
@@ -344,24 +344,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   filterButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '500',
   },
   dropdownArrow: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 10,
     marginLeft: 8,
   },
   restaurantsTitleSection: {
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#F5F5F5',
   },
   restaurantsTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
   },
   listContainer: {
     padding: 16,
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '48%',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     marginBottom: 16,
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
   restaurantImage: {
     width: '100%',
     height: 120,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F0F0F0',
   },
   cardContent: {
     padding: 12,
@@ -390,16 +390,16 @@ const styles = StyleSheet.create({
   restaurantName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 4,
   },
   stars: {
     fontSize: 14,
-    color: '#333',
+    color: '#222126',
   },
   priceText: {
     fontSize: 12,
-    color: '#666',
+    color: '#666666',
     marginTop: 2,
   },
   loadingContainer: {
@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: '#666666',
   },
   errorContainer: {
     flex: 1,
@@ -421,18 +421,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#d9534f',
+    color: '#B51919',
     marginBottom: 16,
     textAlign: 'center',
   },
   retryButton: {
-    backgroundColor: '#d9534f',
+    backgroundColor: '#B51919',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 6,
   },
   retryButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
@@ -445,12 +445,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#222126',
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#666',
+    color: '#666666',
   },
   bottomNav: {
     position: 'absolute',
@@ -458,9 +458,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#E0E0E0',
     paddingVertical: 8,
   },
   navItem: {
@@ -472,20 +472,20 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#F0F0F0',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
   },
   navIconActive: {
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#E0E0E0',
   },
   navIconText: {
     fontSize: 20,
   },
   navLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#666666',
   },
   modalOverlay: {
     flex: 1,
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
     width: '80%',
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#222126',
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -511,10 +511,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#E0E0E0',
   },
   modalOptionText: {
     fontSize: 16,
-    color: '#333',
+    color: '#222126',
   },
 });
