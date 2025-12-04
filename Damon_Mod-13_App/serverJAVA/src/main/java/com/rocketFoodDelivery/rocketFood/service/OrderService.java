@@ -22,7 +22,7 @@ public class OrderService {
 
     @Autowired
     private CustomerRepository customerRepository;
-    
+
     @Autowired
     private NotificationService notificationService;
 
@@ -31,7 +31,7 @@ public class OrderService {
 
     @Autowired
     private OrderStatusRepository orderStatusRepository;
-    
+
     @Autowired
     private CourierRepository courierRepository;
 
@@ -42,9 +42,9 @@ public class OrderService {
 
     @Autowired
     public OrderService(OrderRepository orderRepository,
-                        UserRepository userRepository,
-                        ProductRepository productRepository,
-                        ProductOrderRepository productOrderRepository) {
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            ProductOrderRepository productOrderRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
@@ -58,20 +58,20 @@ public class OrderService {
         if (order == null) {
             return false; // Commande non trouvée
         }
-    
+
         // Trouver le statut par nom (au lieu de par ID)
         OrderStatus newStatus = orderStatusRepository.findByName(statusDTO.getStatus()).orElse(null);
         if (newStatus == null) {
             return false; // Statut non trouvé
         }
-    
+
         // Mettre à jour le statut de la commande
         order.setOrderStatus(newStatus);
         orderRepository.save(order);
-    
+
         return true;
     }
-    
+
     // Retrieves all orders and converts them to DTOs
     public List<ApiOrderDTO> getOrders() {
         List<Order> orders = orderRepository.findAll();
@@ -87,7 +87,7 @@ public class OrderService {
         dto.setCustomer_id(order.getCustomer().getId());
         dto.setCustomer_name(getUserNameByCustomerId(order.getCustomer().getId()));
         dto.setCustomer_address(formatAddress(order.getCustomer().getAddress()));
-    
+
         // Set courier details if available
         if (order.getCourier() != null) {
             dto.setCourier_id(order.getCourier().getId());
@@ -96,26 +96,26 @@ public class OrderService {
             dto.setCourier_id(0); // Default value for orders without an assigned courier
             dto.setCourier_name("Unknown"); // Default value for orders without an assigned courier
         }
-    
+
         dto.setRestaurant_id(order.getRestaurant().getId());
         dto.setRestaurant_name(order.getRestaurant().getName());
         dto.setRestaurant_address(formatAddress(order.getRestaurant().getAddress()));
         dto.setStatus(order.getOrderStatus().getStatus());
-    
+
         // Retrieve and calculate the cost of products for the order
         List<ApiProductForOrderApiDTO> productsForOrder = getProductsForOrder(order);
         dto.setProducts(productsForOrder);
-    
+
         long totalCost = productsForOrder.stream()
                 .mapToLong(ApiProductForOrderApiDTO::getTotal_cost)
                 .sum();
         dto.setTotal_cost(totalCost);
 
         dto.setTimestamp(order.getTimestamp());
-    
+
         return dto;
     }
-    
+
     // Retrieves products for a specific order
     private List<ApiProductForOrderApiDTO> getProductsForOrder(Order order) {
         List<ProductOrder> productOrders = productOrderRepository.findByOrderId(order.getId());
@@ -191,17 +191,17 @@ public class OrderService {
                 .map(this::convertToApiOrderDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // Checks if a customer with the given ID exists
     public boolean customerExists(Integer customerId) {
         return customerRepository.existsById(customerId);
     }
-    
+
     // Checks if a restaurant with the given ID exists
     public boolean restaurantExists(Integer restaurantId) {
         return restaurantRepository.existsById(restaurantId);
     }
-    
+
     // Checks if a courier with the given ID exists
     public boolean courierExists(Integer courierId) {
         return courierRepository.existsById(courierId);
@@ -211,77 +211,77 @@ public class OrderService {
         try {
             // Create a new Order entity
             Order order = new Order();
-            
+
             // Fetch Customer and Restaurant entities from the database
             Customer customer = customerRepository.findById(apiOrderDTO.getCustomer_id()).orElseThrow(
-                () -> new RuntimeException("Customer not found for ID: " + apiOrderDTO.getCustomer_id())
-            );
+                    () -> new RuntimeException("Customer not found for ID: " + apiOrderDTO.getCustomer_id()));
             Restaurant restaurant = restaurantRepository.findById(apiOrderDTO.getRestaurant_id()).orElseThrow(
-                () -> new RuntimeException("Restaurant not found for ID: " + apiOrderDTO.getRestaurant_id())
-            );
-            
+                    () -> new RuntimeException("Restaurant not found for ID: " + apiOrderDTO.getRestaurant_id()));
+
             // Fetch OrderStatus from the database or set a default one
             OrderStatus status = orderStatusRepository.findById(1).orElseThrow(
-                () -> new RuntimeException("Order status not found for ID: " + 1)
-            );
-        
+                    () -> new RuntimeException("Order status not found for ID: " + 1));
+
             // Set the customer and restaurant details in the Order entity
             order.setCustomer(customer);
             order.setRestaurant(restaurant);
-        
-            // Set default or valid restaurant rating
-            order.setRestaurant_rating(1); // Adjust this as needed
-        
+
+            // Generate a random restaurant rating between 1 and 5
+            int randomRating = (int) (Math.random() * 5) + 1;
+            order.setRestaurant_rating(randomRating);
+
             // Set the initial status of the order
             order.setOrderStatus(status); // Default status, could be updated later
-        
+
             // Process the products
             List<ProductOrder> productOrders = apiOrderDTO.getProducts().stream()
-                .map(productDto -> {
-                    // Fetch the product entity from the database using the product ID
-                    Product product = productRepository.findById(productDto.getId()).orElseThrow(
-                        () -> new RuntimeException("Product not found for ID: " + productDto.getId())
-                    );
-                
-                    // Create a ProductOrder
-                    return ProductOrder.builder()
-                        .order(order)
-                        .product(product)
-                        .product_quantity(productDto.getQuantity())
-                        .product_unit_cost(product.getCost()) // Use the cost from the Product entity
-                        .build();
-                })
-                .collect(Collectors.toList());
-            
+                    .map(productDto -> {
+                        // Fetch the product entity from the database using the product ID
+                        Product product = productRepository.findById(productDto.getId()).orElseThrow(
+                                () -> new RuntimeException("Product not found for ID: " + productDto.getId()));
+
+                        // Create a ProductOrder
+                        return ProductOrder.builder()
+                                .order(order)
+                                .product(product)
+                                .product_quantity(productDto.getQuantity())
+                                .product_unit_cost(product.getCost()) // Use the cost from the Product entity
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+
             // Set the products in the Order entity
             order.setProductOrders(productOrders);
-            
+
             // Save the order in the database
             orderRepository.save(order);
-            
+
             // Convert the saved order to ApiOrderDTO for the response
             ApiOrderDTO createdOrderDTO = convertToApiOrderDTO(order);
-            
+
             // Send a notification email-
             if (apiOrderDTO.isSendEmail()) {
                 notificationService.sendEmailNotification(
-                    customer.getEmail(),
-                    createdOrderDTO
-                );
+                        customer.getEmail(),
+                        createdOrderDTO);
             }
-        
+
             // Send an SMS notification if requested
             if (apiOrderDTO.isSendSMS()) {
-                String message = "Thank you, " + customer.getUserEntity().getName() + "!\n" + "We have received your Order (ID: #" + createdOrderDTO.getId() + ") for the restaurant: " + createdOrderDTO.getRestaurant_name() + " and with a total cost of " + createdOrderDTO.getTotal_cost() + "$. We are currently processing your order and will soon be on our way to deliver to you."; // Customize the message
+                String message = "Thank you, " + customer.getUserEntity().getName() + "!\n"
+                        + "We have received your Order (ID: #" + createdOrderDTO.getId() + ") for the restaurant: "
+                        + createdOrderDTO.getRestaurant_name() + " and with a total cost of "
+                        + createdOrderDTO.getTotal_cost()
+                        + "$. We are currently processing your order and will soon be on our way to deliver to you."; // Customize
+                                                                                                                      // the
+                                                                                                                      // message
                 notificationService.sendSmsNotification(
-                    customer.getPhone(),
-                    message
-                );
+                        customer.getPhone(),
+                        message);
             }
-        
-        
+
             return createdOrderDTO;
-        
+
         } catch (RuntimeException e) {
             // Log the exception and rethrow or handle as needed
             System.err.println("Error creating order: " + e.getMessage());
@@ -292,12 +292,12 @@ public class OrderService {
     public ApiOrderDTO getOrderById(int orderId) {
         // Récupérer la commande depuis le repository
         Order order = orderRepository.findById(orderId).orElse(null);
-        
+
         // Vérifier si la commande existe
         if (order == null) {
             return null;
         }
-        
+
         // Convertir l'entité Order en DTO et retourner
         return convertToApiOrderDTO(order);
     }
@@ -306,7 +306,7 @@ public class OrderService {
         return userRepository.findById(customerId)
                 .map(UserEntity::getEmail)
                 .orElse(null);
-        
+
     }
 
     public boolean updateOrderRating(int orderId, int newRating) {
@@ -320,6 +320,3 @@ public class OrderService {
     }
 
 }
-    
-    
-
