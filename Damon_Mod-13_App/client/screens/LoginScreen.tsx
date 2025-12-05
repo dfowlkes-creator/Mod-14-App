@@ -11,6 +11,11 @@ type RootStackParamList = {
   Restaurants: undefined;
 };
 
+/**
+ * LoginScreen - User authentication interface
+ * Validates credentials and navigates to Restaurants on success
+ * Stores customer ID globally for subsequent API requests
+ */
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +36,6 @@ export default function LoginScreen() {
       const response = await authService.login({ email, password });
       
       if (response.success) {
-        // Set the global customer ID for API calls
         (global as any).customerId = response.customer_id || 1;
         navigation.navigate('Restaurants');
       } else {

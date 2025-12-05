@@ -48,7 +48,6 @@ export default function OrderHistoryScreen() {
       setError(null);
       const orderHistory = await orderService.getCustomerOrders(global.customerId);
       
-      // Transform API response to match Order interface
       const transformedOrders: Order[] = orderHistory.map(order => ({
         id: order.id.toString(),
         restaurantName: order.restaurant_name,
@@ -71,7 +70,6 @@ export default function OrderHistoryScreen() {
     }
   };
 
-  // Load orders when screen is focused
   useFocusEffect(
     React.useCallback(() => {
       loadOrders();

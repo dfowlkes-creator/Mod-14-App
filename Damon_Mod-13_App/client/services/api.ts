@@ -1,11 +1,6 @@
 import axios from 'axios';
 
-// Configure your backend base URL
-//const API_BASE_URL = 'http://10.0.0.200:8080';
 const API_BASE_URL = 'http://10.0.0.200:8080';
-
-
-console.log('📡 API Base URL:', API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -14,10 +9,13 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to include auth token
+/**
+ * Interceptor automatically attaches JWT bearer token to all outgoing requests
+ * Token is stored globally after successful login via authService
+ */
 api.interceptors.request.use(
   (config) => {
-    const token = global.authToken; // You'll store this after login
+    const token = global.authToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

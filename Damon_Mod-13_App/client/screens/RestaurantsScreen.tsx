@@ -31,10 +31,17 @@ const restaurantImages: { [key: string]: any } = {
   'default': require('../assets/Images/RestaurantMenu.jpg'),
 };
 
+/**
+ * Maps price_range integer (1-3) to visual dollar signs ($, $$, $$$)
+ */
 const getPriceString = (priceRange: number): string => {
   return '$'.repeat(priceRange);
 };
 
+/**
+ * Selects restaurant image based on cuisine keywords in name
+ * Falls back to default menu image if no keyword match
+ */
 const getRestaurantImage = (name: string) => {
   const nameLower = name.toLowerCase();
   if (nameLower.includes('greek')) return restaurantImages.Greek;
@@ -46,6 +53,11 @@ const getRestaurantImage = (name: string) => {
   return restaurantImages.default;
 };
 
+/**
+ * RestaurantsScreen - Displays filterable list of restaurants
+ * Supports filtering by star rating (3-5) and price range (1-3)
+ * Reloads data when filters change or screen comes into focus
+ */
 export default function RestaurantsScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);

@@ -68,13 +68,10 @@ export interface Order {
 
 export const authService = {
   login: async (credentials: AuthRequest): Promise<AuthResponse> => {
-    console.log('🔐 POST to: /api/auth');
-
     const response = await api.post('/api/auth', credentials);
 
-    // The backend might send success as boolean or string — normalize here.
+    // Normalize success field - backend inconsistently returns string or boolean
     const raw: any = response.data;
-
     const success: boolean =
       typeof raw.success === 'string'
         ? raw.success === 'true'
@@ -86,10 +83,8 @@ export const authService = {
     };
 
     if (normalized.accessToken) {
-      // Store token globally
       (global as any).authToken = normalized.accessToken;
 
-      // And on the axios instance for subsequent requests
       const anyApi = api as any;
       if (anyApi.defaults && anyApi.defaults.headers) {
         anyApi.defaults.headers.common =
@@ -113,7 +108,6 @@ export const restaurantService = {
     if (priceRange) params.price_range = priceRange;
 
     const response = await api.get('/api/restaurants', { params });
-    // Backend returns { message: "Success", data: [...] } or just [...]
     return response.data.data ?? response.data;
   },
 

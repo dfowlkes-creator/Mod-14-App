@@ -18,6 +18,11 @@ interface MenuItem {
   description?: string;
 }
 
+/**
+ * RestaurantMenuScreen - Displays menu items with quantity controls
+ * Quantities reset to 0 when component mounts (switching restaurants)
+ * Order button disabled when no items selected
+ */
 export default function RestaurantMenuScreen() {
   const route = useRoute();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
