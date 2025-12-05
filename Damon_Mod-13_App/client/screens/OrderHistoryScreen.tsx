@@ -61,6 +61,9 @@ export default function OrderHistoryScreen() {
         })),
       }));
       
+      // Sort by order ID descending (most recent first)
+      transformedOrders.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+      
       setOrders(transformedOrders);
     } catch (err) {
       console.error('Error loading orders:', err);

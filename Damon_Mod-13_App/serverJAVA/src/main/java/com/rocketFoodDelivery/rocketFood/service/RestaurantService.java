@@ -26,7 +26,6 @@ public class RestaurantService {
     private final OrderRepository orderRepository;
     private final ProductOrderRepository productOrderRepository;
     private final UserRepository userRepository;
-    private final AddressService addressService;
     private final AddressRepository addressRepository;
 
     @Autowired
@@ -36,14 +35,12 @@ public class RestaurantService {
             OrderRepository orderRepository,
             ProductOrderRepository productOrderRepository,
             UserRepository userRepository,
-            AddressService addressService,
             AddressRepository addressRepository) {
         this.restaurantRepository = restaurantRepository;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.productOrderRepository = productOrderRepository;
         this.userRepository = userRepository;
-        this.addressService = addressService;
         this.addressRepository = addressRepository;
     }
 
