@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, ActivityIndicator, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { productService, orderService } from '../services/apiService';
@@ -170,7 +170,7 @@ export default function RestaurantMenuScreen() {
           
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#B51919" />
+              <ActivityIndicator size="large" color="#DA583B" />
               <Text style={styles.loadingText}>Loading menu...</Text>
             </View>
           ) : error ? (
@@ -350,7 +350,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 12 : 12,
+    paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
     height: 40,
   },
   logoutButton: {
-    backgroundColor: '#B51919',
+    backgroundColor: '#DA583B',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 6,
@@ -464,7 +465,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   createOrderButton: {
-    backgroundColor: '#B51919',
+    backgroundColor: '#DA583B',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -571,7 +572,7 @@ const styles = StyleSheet.create({
     color: '#222126',
   },
   confirmButton: {
-    backgroundColor: '#B51919',
+    backgroundColor: '#DA583B',
     marginHorizontal: 24,
     marginBottom: 24,
     paddingVertical: 14,
@@ -611,7 +612,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#B51919',
+    backgroundColor: '#DA583B',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
@@ -629,7 +630,7 @@ const styles = StyleSheet.create({
   },
   failureText: {
     fontSize: 14,
-    color: '#B51919',
+    color: '#DA583B',
     textAlign: 'center',
     fontWeight: '600',
   },

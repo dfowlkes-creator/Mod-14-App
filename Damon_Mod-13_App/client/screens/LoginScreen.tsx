@@ -177,13 +177,13 @@ const styles = StyleSheet.create({
     color: '#222126',
   },
   error: {
-    color: '#B51919',
+    color: '#DA583B',
     marginBottom: 16,
     textAlign: 'center',
     fontSize: 14,
   },
   button: {
-    backgroundColor: '#B51919',
+    backgroundColor: '#DA583B',
     borderRadius: 6,
     paddingVertical: 16,
     alignItems: 'center',
