@@ -160,51 +160,51 @@
 //     // Test to create an Order with missing required filds
 //     @Test
 //     void testCreateOrder_MissingRequiredFields() throws Exception {
-//         // Créer un ApiOrderDTO avec des champs manquants
+//         // Create an ApiOrderDTO with missing fields
 //         ApiOrderDTO orderDTO = new ApiOrderDTO();
-//         orderDTO.setCustomer_id(0); // ID client manquant
-//         orderDTO.setRestaurant_id(0); // ID restaurant manquant
-//         orderDTO.setProducts(null); // Produits manquants
+//         orderDTO.setCustomer_id(0); // Missing customer ID
+//         orderDTO.setRestaurant_id(0); // Missing restaurant ID
+//         orderDTO.setProducts(null); // Missing products
     
-//         // Effectuer une requête POST et vérifier que le statut est 400 Bad Request
+//         // Perform POST request and verify status is 400 Bad Request
 //         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
 //                 .contentType(MediaType.APPLICATION_JSON)
 //                 .content(asJsonString(orderDTO)))
-//                 .andExpect(MockMvcResultMatchers.status().isBadRequest()) // Vérifie que le statut est 400
+//                 .andExpect(MockMvcResultMatchers.status().isBadRequest()) // Verify status is 400
 //                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Restaurant ID, customer ID, and products are required"));
 //     }
     
 //     // Test to create an Order with an Invalid restaurant ID/customer ID
 //     @Test
 //     void testCreateOrder_InvalidRestaurantOrCustomerId() throws Exception {
-//         // Créer un ApiOrderDTO avec des IDs invalides
+//         // Create an ApiOrderDTO with invalid IDs
 //         ApiProductForOrderApiDTO product = new ApiProductForOrderApiDTO();
 //         product.setId(1);
 //         product.setQuantity(2);
 
 //         ApiOrderDTO orderDTO = new ApiOrderDTO();
-//         orderDTO.setCustomer_id(999); // ID client invalide
-//         orderDTO.setRestaurant_id(999); // ID restaurant invalide
+//         orderDTO.setCustomer_id(999); // Invalid customer ID
+//         orderDTO.setRestaurant_id(999); // Invalid restaurant ID
 //         orderDTO.setProducts(Collections.singletonList(product));
 
-//         // Simuler le comportement du service pour lever une exception
+//         // Mock service behavior to throw exception
 //         when(orderService.createOrder(any(ApiOrderDTO.class)))
 //                 .thenThrow(new RuntimeException("Customer not found for ID: 999"));
 
-//         // Effectuer une requête POST et vérifier que le statut est 422 Unprocessable Entity
+//         // Perform POST request and verify status is 422 Unprocessable Entity
 //         mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
 //                 .contentType(MediaType.APPLICATION_JSON)
 //                 .content(asJsonString(orderDTO)))
-//                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity()) // Vérifie que le statut est 422
+//                 .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity()) // Verify status is 422
 //                 .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Invalid restaurant or customer ID"));
 //     }
 
 //     // Test to create an Order with an Invalid product ID
 //     @Test
 //     void testCreateOrder_InvalidProductId() throws Exception {
-//     // Créer un ApiProductForOrderApiDTO avec un ID de produit invalide
+//     // Create an ApiProductForOrderApiDTO with invalid product ID
 //     ApiProductForOrderApiDTO product = new ApiProductForOrderApiDTO();
-//     product.setId(999); // ID produit invalide
+//     product.setId(999); // Invalid product ID
 //     product.setQuantity(2);
 
 //     ApiOrderDTO orderDTO = new ApiOrderDTO();
@@ -212,15 +212,15 @@
 //     orderDTO.setRestaurant_id(1);
 //     orderDTO.setProducts(Collections.singletonList(product));
 
-//     // Simuler le comportement du service pour lever une exception
+//     // Mock service behavior to throw exception
 //     when(orderService.createOrder(any(ApiOrderDTO.class)))
 //             .thenThrow(new RuntimeException("Product not found for ID: 999"));
 
-//     // Effectuer une requête POST et vérifier que le statut est 422 Unprocessable Entity
+//     // Perform POST request and verify status is 422 Unprocessable Entity
 //     mockMvc.perform(MockMvcRequestBuilders.post("/api/orders")
 //             .contentType(MediaType.APPLICATION_JSON)
 //             .content(asJsonString(orderDTO)))
-//             .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity()) // Vérifie que le statut est 422
+//             .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity()) // Verify status is 422
 //             .andExpect(MockMvcResultMatchers.jsonPath("$.error").value("Invalid product ID"));
 //     }
 

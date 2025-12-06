@@ -84,7 +84,7 @@ public class AuthController {
         UserEntity user = userOptional.get();
         String primaryEmail = user.getEmail();
 
-        // Récupérer les informations du client et du coursier
+        // Retrieve customer and courier information
         Optional<Customer> customerOptional = customerRepository.findByUserEntityId(id);
         Optional<Courier> courierOptional = courierRepository.findByUserEntityId(id);
 
@@ -108,7 +108,7 @@ public class AuthController {
             return ResponseEntity.status(422).body("Invalid ID");
         }
 
-        // Mise à jour des informations du client
+        // Update customer information
         if (accountUpdateDTO.getCustomerEmail() != null || accountUpdateDTO.getCustomerPhone() != null) {
             Optional<Customer> customerOptional = customerRepository.findByUserEntityId(id);
             if (customerOptional.isPresent()) {
@@ -119,7 +119,7 @@ public class AuthController {
             }
         }
 
-        // Mise à jour des informations du coursier
+        // Update courier information
         if (accountUpdateDTO.getCourierEmail() != null || accountUpdateDTO.getCourierPhone() != null) {
             Optional<Courier> courierOptional = courierRepository.findByUserEntityId(id);
             if (courierOptional.isPresent()) {
