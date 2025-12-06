@@ -53,19 +53,19 @@ public class OrderService {
 
     // Updates the status of an order
     public boolean updateOrderStatus(int orderId, ApiOrderStatusDTO statusDTO) {
-        // Trouver la commande par ID
+        // Find the order by ID
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
-            return false; // Commande non trouvée
+            return false; // Order not found
         }
 
-        // Trouver le statut par nom (au lieu de par ID)
+        // Find the status by name (instead of by ID)
         OrderStatus newStatus = orderStatusRepository.findByName(statusDTO.getStatus()).orElse(null);
         if (newStatus == null) {
-            return false; // Statut non trouvé
+            return false; // Status not found
         }
 
-        // Mettre à jour le statut de la commande
+        // Update the order status
         order.setOrderStatus(newStatus);
         orderRepository.save(order);
 
@@ -290,15 +290,15 @@ public class OrderService {
     }
 
     public ApiOrderDTO getOrderById(int orderId) {
-        // Récupérer la commande depuis le repository
+        // Retrieve the order from the repository
         Order order = orderRepository.findById(orderId).orElse(null);
 
-        // Vérifier si la commande existe
+        // Check if the order exists
         if (order == null) {
             return null;
         }
 
-        // Convertir l'entité Order en DTO et retourner
+        // Convert the Order entity to DTO and return
         return convertToApiOrderDTO(order);
     }
 
@@ -310,10 +310,10 @@ public class OrderService {
     }
 
     public boolean updateOrderRating(int orderId, int newRating) {
-        // Trouver l'ordre par ID
+        // Find the order by ID
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        // Mettre à jour le rating
+        // Update the rating
         order.setRestaurant_rating(newRating);
         orderRepository.save(order);
         return true;

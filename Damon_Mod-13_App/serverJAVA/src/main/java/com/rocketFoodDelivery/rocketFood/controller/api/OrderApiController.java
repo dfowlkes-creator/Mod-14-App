@@ -162,16 +162,16 @@ public class OrderApiController {
 
     @GetMapping("/api/orders/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable("id") int orderId) {
-    // Appeler le service pour récupérer les détails de la commande
+    // Call the service to retrieve order details
     ApiOrderDTO orderDTO = orderService.getOrderById(orderId);
     
-    // Vérifier si la commande existe
+    // Check if the order exists
     if (orderDTO == null) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(Collections.singletonMap("error", "Order not found"));
     }
 
-    // Retourner les détails de la commande
+    // Return the order details
     return ResponseEntity.ok(orderDTO);
     }
 
