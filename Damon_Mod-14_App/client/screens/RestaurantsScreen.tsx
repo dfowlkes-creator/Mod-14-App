@@ -287,6 +287,18 @@ export default function RestaurantsScreen() {
           </View>
           <Text style={styles.navLabel}>OrderHistory</Text>
         </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => {
+            // TODO: Navigate to Account screen when implemented
+            console.log('Account pressed');
+          }}
+        >
+          <View style={styles.navIcon}>
+            <Text style={styles.navIconText}>👤</Text>
+          </View>
+          <Text style={styles.navLabel}>Account</Text>
+        </TouchableOpacity>
       </View>
     </View>
     </SafeAreaView>

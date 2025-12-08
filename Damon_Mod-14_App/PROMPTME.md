@@ -294,13 +294,210 @@ The current setup is the recommended best practice for monorepos.
 
 ## ✏️ Prompt - 07
 
-**📎 Context:** Write what you were working on here
+**📎 Context:** Files were deleted after pulling from dev branch - need to recover lost work
 
-Paste your prompt or question here
+Why were my PROMPTME and AccountTypeSelectionScreen deleted?
 
 ## 🤖 Response - 07
 
-Paste the AI's answer here
+The files were likely deleted during the `git pull origin dev` because the remote dev branch didn't have those files. When you pulled, Git synchronized your local branch with the remote, removing files that don't exist on the remote.
+
+Your **`PROMPTME.md` and `AccountTypeSelectionScreen.tsx` were deleted** because:
+
+1. **You pulled from `origin/dev`** which is at commit `faf0d02` (the initial commit from the remote)
+2. **Your local changes** (the PROMPTME edits and AccountTypeSelectionScreen creation) were **not committed** before pulling
+3. Git synchronized your local branch with the remote, **discarding uncommitted local changes**
+
+The remote `dev` branch never had those files, so when you pulled, Git removed them to match the remote state.
+
+**To recover your work:**
+
+I checked `git reflog` and found your work was saved in commit `e180b03` on the `main` branch. I recovered both files by running:
+
+```bash
+git show e180b03:./PROMPTME.md > PROMPTME.md
+git show e180b03:./client/screens/AccountTypeSelectionScreen.tsx > client/screens/AccountTypeSelectionScreen.tsx
+```
+
+Both files have been successfully restored to your working directory!
+
+---
+
+## ✏️ Prompt - 08
+
+**📎 Context:** Account selection screen not appearing after login - need to debug the navigation flow
+
+Account selection page isn't populating after successful login. The page goes directly to the restaurant page after logging in.
+
+## 🤖 Response - 08
+
+The issue was that the `LoginScreen.tsx` still had the old login logic and the `AccountTypeSelection` screen wasn't registered in `App.tsx`. I made the following fixes:
+
+**Changes made:**
+
+1. ✅ Added `AccountTypeSelection` route to `App.tsx` navigation stack
+2. ✅ Imported `AccountTypeSelectionScreen` in `App.tsx`
+3. ✅ Updated `LoginScreen.tsx` to check if user has both `customer_id` and `courier_id`
+4. ✅ If user has both accounts → navigates to `AccountTypeSelection` screen
+5. ✅ If user has only one account → navigates directly to the appropriate app
+6. ✅ Added debug logging to see what IDs are returned from backend
+
+Now when you log in with an account that has both customer and courier roles, you'll see the account selection page.
+
+---
+
+## ✏️ Prompt - 09
+
+**📎 Context:** Need to create REST API endpoints for courier operations to match the existing restaurant and order endpoints
+
+I now need to create a courier endpoint for the couriers. The DBeaver database have the fields that are within the screenshot.
+
+## 🤖 Response - 09
+
+I've created a complete courier endpoint system following your existing API patterns:
+
+### Created Files:
+
+**1. ApiCourierDTO.java** - Data Transfer Object
+Maps all courier fields from your database including: id, email, phone, address details, courier_status, active status, and user_id
+
+**2. CourierApiController.java** - REST API Endpoints
+Available endpoints:
+
+- `GET /api/couriers/{id}` - Get courier by ID
+- `GET /api/couriers` - Get all active couriers
+- `PUT /api/couriers/{id}/status?statusId={statusId}` - Update courier status
+- `PUT /api/couriers/{id}/active?active={true/false}` - Update active status
+
+**3. Updated CourierService.java** - Business Logic
+
+- `getCourierById(int id)` - Retrieves courier and converts to DTO
+- `getAllActiveCouriers()` - Returns all active couriers
+- `updateCourierStatus(int courierId, int statusId)` - Updates courier status
+- `updateCourierActiveStatus(int courierId, boolean active)` - Enables/disables courier
+- `convertToDTO(Courier courier)` - Converts entity to DTO with all fields
+
+The endpoints follow the same pattern as your existing controllers and include proper error handling. The service will restart automatically with Spring Boot DevTools and the new endpoints will be available at `http://localhost:8080/api/couriers`.
+
+---
+
+## ✏️ Prompt - 10
+
+**📎 Context:** Need to understand the database structure to identify which users have courier vs customer accounts for testing
+
+I don't know who the couriers are. There are only 3 users in the database. The couriers page doesn't list who is a courier and neither does the user table. How do i distinguish the two. I'm currently logged in as erica.ger and it takes me to the account selection screen upon logging in.
+
+## 🤖 Response - 10
+
+Looking at the `DataSeeder.java`, here's the current user setup:
+
+| User                      | Email                | Customer Account       | Courier Account       |
+| ------------------------- | -------------------- | ---------------------- | --------------------- |
+| **Erica Ger** (user_id 1) | erica.ger@gmail.com  | ✅ Yes (Customer ID 1) | ✅ Yes (Courier ID 1) |
+| **John Doe** (user_id 2)  | john.doe@example.com | ✅ Yes (Customer ID 2) | ❌ No                 |
+| **Jane Doe** (user_id 3)  | jane.doe@example.com | ❌ No                  | ✅ Yes (Courier ID 2) |
+
+**This explains why `erica.ger` goes to the Account Selection screen** - she has BOTH customer and courier accounts!
+
+To query who has what in DBeaver:
+
+```sql
+SELECT
+    u.id as user_id,
+    u.name,
+    u.email,
+    c.id as customer_id,
+    co.id as courier_id,
+    CASE
+        WHEN c.id IS NOT NULL AND co.id IS NOT NULL THEN 'Both'
+        WHEN c.id IS NOT NULL THEN 'Customer Only'
+        WHEN co.id IS NOT NULL THEN 'Courier Only'
+        ELSE 'None'
+    END as account_type
+FROM users u
+LEFT JOIN customers c ON u.id = c.user_id
+LEFT JOIN courier co ON u.id = co.user_id;
+```
+
+Your implementation is working correctly! Erica has both accounts, which is why she sees the selection screen.
+
+---
+
+## ✏️ Prompt - 11
+
+**📎 Context:** Testing the courier API endpoint with Postman to verify it returns data correctly
+
+I know that i would have to query /api/courier/2 to conduct a Postman GET, correct?
+
+## 🤖 Response - 11
+
+Yes, that's correct! Based on the courier endpoint I created earlier, you would use:
+
+```
+GET http://localhost:8080/api/couriers/2
+```
+
+Note: It's **`couriers`** (plural) not `courier` (singular).
+
+This will return the details for Courier ID 2 (Jane Doe), which should include:
+
+- id, email, phone
+- address details
+- courier_status_id and courier_status_name
+- active status
+- user_id
+
+You can also test:
+
+- `GET http://localhost:8080/api/couriers` - Returns all active couriers
+- `GET http://localhost:8080/api/couriers/1` - Returns details for Courier ID 1 (Erica)
+
+---
+
+## ✏️ Prompt - 12
+
+**📎 Context:** Verifying the courier API response data is correct and not just placeholder values
+
+The status response was successful (200) but the output data appears to just be placeholder data. Here is the output: {"id":2,"email":"courierB@example.com","phone":"+1 555-6666","address_id":2,"street_address":"456 Elm St","city":"Othertown","postal_code":"67890","courier_status_id":2,"courier_status_name":"busy","active":true,"user_id":3}
+
+## 🤖 Response - 12
+
+That's not placeholder data - that's the **actual seeded data** from your database! The endpoint is working perfectly. Here's what you're seeing for Courier ID 2 (Jane Doe):
+
+- **email**: courierB@example.com ✅
+- **phone**: +1 555-6666 ✅
+- **street_address**: 456 Elm St ✅
+- **city**: Othertown ✅
+- **courier_status_name**: busy ✅
+- **user_id**: 3 (Jane Doe) ✅
+
+This matches exactly what was seeded in `DataSeeder.java`. The endpoint is working correctly and returning real database data! If you want more realistic data, you would need to update the seed data or manually update the database records.
+
+---
+
+## ✏️ Prompt - 13
+
+**📎 Context:** Understanding the relationship between user email and courier email fields in the database
+
+Does this mean that Jane Doe has an additional email address of courierB@example.com or there isn't any correlation outside of the DataSeeder?
+
+## 🤖 Response - 13
+
+There's **no correlation outside of DataSeeder** - it's just inconsistent seed data.
+
+Jane Doe has:
+
+- **User table email**: jane.doe@example.com (used for login)
+- **Courier table email**: courierB@example.com (just a field in the courier record)
+
+These are **two separate email fields** in different tables. The courier table has its own email field that was likely intended for courier-specific contact info (maybe for customers to contact the courier directly), but in the seed data, they just used generic placeholder emails.
+
+**In reality:**
+
+- Jane logs in with: `jane.doe@example.com`
+- But her courier profile shows: `courierB@example.com`
+
+This is just sloppy seed data. Ideally, they should match or the courier email should be removed if it's redundant. The `user_id` foreign key is what actually links the courier record to Jane Doe's user account, not the email addresses.
 
 ---
 

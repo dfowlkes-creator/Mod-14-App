@@ -8,6 +8,10 @@ type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Details: undefined;
+  AccountTypeSelection: {
+    customerId?: number;
+    courierId?: number;
+  };
   Restaurants: undefined;
 };
 
@@ -36,8 +40,36 @@ export default function LoginScreen() {
       const response = await authService.login({ email, password });
       
       if (response.success) {
-        (global as any).customerId = response.customer_id || 1;
-        navigation.navigate('Restaurants');
+        const hasCustomerAccount = !!response.customer_id;
+        const hasCourierAccount = !!response.courier_id;
+        
+        // Debug logging
+        console.log('Login response:', {
+          customer_id: response.customer_id,
+          courier_id: response.courier_id,
+          hasCustomerAccount,
+          hasCourierAccount
+        });
+        
+        if (hasCustomerAccount && hasCourierAccount) {
+          // User has both accounts, show selection screen
+          navigation.navigate('AccountTypeSelection', {
+            customerId: response.customer_id,
+            courierId: response.courier_id,
+          });
+        } else if (hasCustomerAccount) {
+          // Only customer account, navigate directly to customer app
+          (global as any).customerId = response.customer_id;
+          (global as any).accountType = 'customer';
+          navigation.navigate('Restaurants');
+        } else if (hasCourierAccount) {
+          // Only courier account, navigate directly to courier app
+          (global as any).courierId = response.courier_id;
+          (global as any).accountType = 'courier';
+          navigation.navigate('Restaurants'); // Placeholder - will be courier screen
+        } else {
+          setError('No account found. Please contact support.');
+        }
       } else {
         setError('Incorrect email or password. Please try again.');
       }
