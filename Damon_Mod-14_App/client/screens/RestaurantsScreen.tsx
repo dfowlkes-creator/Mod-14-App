@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  Modal,
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -143,9 +144,7 @@ export default function RestaurantsScreen() {
               onPress={() => setShowRatingModal(true)}
             >
               <Text style={styles.filterButtonText}>
-                {selectedRating
-                  ? renderStars(selectedRating)
-                  : '-- Select --'}
+                {selectedRating ? renderStars(selectedRating) : '-- Select --'}
               </Text>
               <Text style={styles.dropdownArrow}>▼</Text>
             </Pressable>
@@ -157,9 +156,7 @@ export default function RestaurantsScreen() {
               onPress={() => setShowPriceModal(true)}
             >
               <Text style={styles.filterButtonText}>
-                {selectedPrice
-                  ? getPriceString(selectedPrice)
-                  : '-- Select --'}
+                {selectedPrice ? getPriceString(selectedPrice) : '-- Select --'}
               </Text>
               <Text style={styles.dropdownArrow}>▼</Text>
             </Pressable>
@@ -172,135 +169,151 @@ export default function RestaurantsScreen() {
         </View>
 
         {/* Content */}
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#DA583B" />
-            <Text style={styles.loadingText}>Loading restaurants...</Text>
-          </View>
-        ) : error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity
-              style={styles.retryButton}
-              onPress={loadRestaurants}
-            >
-              <Text style={styles.retryButtonText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
-        ) : filteredRestaurants.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No restaurants found</Text>
-            <Text style={styles.emptySubtext}>
-              Try adjusting your filters
-            </Text>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredRestaurants}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2}
-            contentContainerStyle={styles.listContainer}
-            columnWrapperStyle={styles.row}
-            showsVerticalScrollIndicator={false}
-            renderItem={({ item }) => (
+        <View style={styles.content}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#DA583B" />
+              <Text style={styles.loadingText}>Loading restaurants...</Text>
+            </View>
+          ) : error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity
-                style={styles.card}
-                onPress={() => handleRestaurantPress(item)}
+                style={styles.retryButton}
+                onPress={loadRestaurants}
               >
-                <Image
-                  source={getRestaurantImage(item.name)}
-                  style={styles.restaurantImage}
-                />
-                <View style={styles.cardContent}>
-                  <Text style={styles.restaurantName}>{item.name}</Text>
-                  <Text style={styles.stars}>
-                    {renderStars(item.rating)}
-                  </Text>
-                  <Text style={styles.priceText}>
-                    {getPriceString(item.price_range)}
-                  </Text>
-                </View>
+                <Text style={styles.retryButtonText}>Retry</Text>
               </TouchableOpacity>
-            )}
-          />
-        )}
+            </View>
+          ) : filteredRestaurants.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No restaurants found</Text>
+              <Text style={styles.emptySubtext}>
+                Try adjusting your filters
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={filteredRestaurants}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              style={styles.list}
+              contentContainerStyle={styles.listContainer}
+              columnWrapperStyle={styles.row}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.card}
+                  onPress={() => handleRestaurantPress(item)}
+                >
+                  <Image
+                    source={getRestaurantImage(item.name)}
+                    style={styles.restaurantImage}
+                  />
+                  <View style={styles.cardContent}>
+                    <Text style={styles.restaurantName}>{item.name}</Text>
+                    <Text style={styles.stars}>{renderStars(item.rating)}</Text>
+                    <Text style={styles.priceText}>
+                      {getPriceString(item.price_range)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </View>
 
         {/* Rating Filter "Modal" */}
-        {showRatingModal && (
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={() => setShowRatingModal(false)}
-          >
-            <View
-              style={styles.modalContent}
-              // prevent press on content from closing
-              onStartShouldSetResponder={() => true}
-            >
-              <Text style={styles.modalTitle}>Select Rating</Text>
-              <Pressable
-                style={styles.modalOption}
-                onPress={() => {
-                  setSelectedRating(null);
-                  setShowRatingModal(false);
-                }}
-              >
-                <Text style={styles.modalOptionText}>All Ratings</Text>
-              </Pressable>
-              {[3, 4, 5].map((rating) => (
-                <Pressable
-                  key={rating}
-                  style={styles.modalOption}
-                  onPress={() => {
-                    setSelectedRating(rating);
-                    setShowRatingModal(false);
-                  }}
-                >
-                  <Text style={styles.modalOptionText}>
-                    {rating} Stars
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </Pressable>
-        )}
+        {/* Rating Filter Modal */}
+<Modal
+  visible={showRatingModal}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowRatingModal(false)} // Android back button
+>
+  <Pressable
+    style={styles.modalOverlay}
+    onPress={() => setShowRatingModal(false)}      // tap outside = close
+  >
+    <Pressable
+      style={styles.modalContent}
+      onPress={() => {}}                           // absorb tap, don't close
+    >
+      <Text style={styles.modalTitle}>Select Rating</Text>
+
+      <Pressable
+        style={styles.modalOption}
+        onPress={() => {
+          setSelectedRating(null);
+          setShowRatingModal(false);
+        }}
+      >
+        <Text style={styles.modalOptionText}>All Ratings</Text>
+      </Pressable>
+
+      {[3, 4, 5].map((rating) => (
+        <Pressable
+          key={rating}
+          style={styles.modalOption}
+          onPress={() => {
+            setSelectedRating(rating);
+            setShowRatingModal(false);
+          }}
+        >
+          <Text style={styles.modalOptionText}>{rating} Stars</Text>
+        </Pressable>
+      ))}
+    </Pressable>
+  </Pressable>
+</Modal>
+
 
         {/* Price Filter "Modal" */}
-        {showPriceModal && (
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={() => setShowPriceModal(false)}
-          >
-            <View
-              style={styles.modalContent}
-              onStartShouldSetResponder={() => true}
-            >
-              <Text style={styles.modalTitle}>Select Price</Text>
-              <Pressable
-                style={styles.modalOption}
-                onPress={() => {
-                  setSelectedPrice(null);
-                  setShowPriceModal(false);
-                }}
-              >
-                <Text style={styles.modalOptionText}>All Prices</Text>
-              </Pressable>
-              {[1, 2, 3].map((price) => (
-                <Pressable
-                  key={price}
-                  style={styles.modalOption}
-                  onPress={() => {
-                    setSelectedPrice(price);
-                    setShowPriceModal(false);
-                  }}
-                >
-                  <Text style={styles.modalOptionText}>
-                    {getPriceString(price)}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </Pressable>
-        )}
+        {/* Price Filter Modal */}
+<Modal
+  visible={showPriceModal}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setShowPriceModal(false)}
+>
+  <Pressable
+    style={styles.modalOverlay}
+    onPress={() => setShowPriceModal(false)}
+  >
+    <Pressable
+      style={styles.modalContent}
+      onPress={() => {}}
+    >
+      <Text style={styles.modalTitle}>Select Price</Text>
+
+      <Pressable
+        style={styles.modalOption}
+        onPress={() => {
+          setSelectedPrice(null);
+          setShowPriceModal(false);
+        }}
+      >
+        <Text style={styles.modalOptionText}>All Prices</Text>
+      </Pressable>
+
+      {[1, 2, 3].map((price) => (
+        <Pressable
+          key={price}
+          style={styles.modalOption}
+          onPress={() => {
+            setSelectedPrice(price);
+            setShowPriceModal(false);
+          }}
+        >
+          <Text style={styles.modalOptionText}>
+            {getPriceString(price)}
+          </Text>
+        </Pressable>
+      ))}
+    </Pressable>
+  </Pressable>
+</Modal>
+
 
         {/* Bottom nav */}
         <View style={styles.bottomNav}>
@@ -428,9 +441,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#222126',
   },
+
+  // NEW: content wrapper + FlatList style
+  content: {
+    flex: 1,
+  },
+  list: {
+    flex: 1,
+  },
+
   listContainer: {
     padding: 16,
-    paddingBottom: 80,
+    paddingBottom: 80, // keep content above bottom nav
   },
   row: {
     justifyContent: 'space-between',
@@ -440,7 +462,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     marginBottom: 16,
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    // Native shadow (instead of boxShadow)
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
     elevation: 3,
     overflow: 'hidden',
   },
@@ -552,25 +578,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666666',
   },
-  modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    elevation: 9999,
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    width: '80%',
-    maxWidth: 300,
-  },
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContent: {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 12,
+  padding: 20,
+  width: '80%',
+  maxWidth: 300,
+},
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'http://10.0.0.200:8080';
-
+//const API_BASE_URL = 'http://192.168.5.255:8080'; // Alternative local IP
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
