@@ -28,6 +28,22 @@ interface Delivery {
   status: string;
 }
 
+interface OrderDetail {
+  id: number;
+  customer_address: string;
+  restaurant_name: string;
+  status: string;
+  timestamp: string;
+  total_cost: number;
+  products: Array<{
+    id: number;
+    product_name: string;
+    quantity: number;
+    unit_cost: number;
+    total_cost: number;
+  }>;
+}
+
 /**
  * CourierDeliveriesScreen - Displays courier's assigned deliveries
  * Status buttons are clickable and cycle through: PENDING → IN_PROGRESS → DELIVERED
@@ -41,6 +57,8 @@ export default function CourierDeliveriesScreen() {
   const [updatingOrderId, setUpdatingOrderId] = useState<number | null>(null);
   const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [orderDetail, setOrderDetail] = useState<OrderDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   const loadDeliveries = async () => {
     const courierId = (global as any).courierId;
@@ -54,18 +72,43 @@ export default function CourierDeliveriesScreen() {
     try {
       setLoading(true);
       setError(null);
-      const orders = await orderService.getCustomerOrders(courierId); // Using same endpoint, backend returns courier orders when courier ID is provided
+      const orders = await orderService.getCourierOrders(courierId);
       
-      const transformedDeliveries: Delivery[] = orders.map((order: any) => ({
-        id: order.id,
-        address: order.customer_address || order.address || 'Address not available',
-        status: order.status,
-      }));
+      console.log('📦 Raw orders response:', orders);
+      console.log('📦 Orders type:', typeof orders);
+      console.log('📦 Is array:', Array.isArray(orders));
       
+      // Handle empty response or non-array response
+      if (!orders || !Array.isArray(orders)) {
+        console.log('⚠️ No orders or invalid response, setting empty array');
+        setDeliveries([]);
+        return;
+      }
+      
+      const transformedDeliveries: Delivery[] = orders.map((order: any) => {
+        // Convert backend status format to frontend format
+        let frontendStatus = order.status;
+        if (order.status === 'in progress') {
+          frontendStatus = 'IN_PROGRESS';
+        } else if (order.status === 'pending') {
+          frontendStatus = 'PENDING';
+        } else if (order.status === 'delivered') {
+          frontendStatus = 'DELIVERED';
+        }
+        
+        return {
+          id: order.id,
+          address: order.customer_address || order.address || 'Address not available',
+          status: frontendStatus,
+        };
+      });
+      
+      console.log('✅ Transformed deliveries:', transformedDeliveries);
       setDeliveries(transformedDeliveries);
     } catch (err) {
       console.error('Error loading deliveries:', err);
       setError('Failed to load deliveries');
+      setDeliveries([]);
     } finally {
       setLoading(false);
     }
@@ -102,7 +145,11 @@ export default function CourierDeliveriesScreen() {
       setUpdatingOrderId(delivery.id);
       console.log(`Updating order ${delivery.id} status from ${delivery.status} to ${nextStatus}`);
       
-      await orderService.updateStatus(delivery.id, nextStatus);
+      // Convert frontend status format to backend format
+      const backendStatus = nextStatus === 'IN_PROGRESS' ? 'in progress' : nextStatus.toLowerCase();
+      console.log(`Sending backend status: ${backendStatus}`);
+      
+      await orderService.updateStatus(delivery.id, backendStatus);
       
       // Update local state
       setDeliveries(prev =>
@@ -138,6 +185,24 @@ export default function CourierDeliveriesScreen() {
       default:
         return status;
     }
+  };
+
+  const loadOrderDetails = async (orderId: number) => {
+    try {
+      setLoadingDetail(true);
+      const details = await orderService.getOrderById(orderId);
+      setOrderDetail(details as any);
+    } catch (err) {
+      console.error('Error loading order details:', err);
+      alert('Failed to load order details');
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  const formatDate = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
   return (
@@ -212,9 +277,10 @@ export default function CourierDeliveriesScreen() {
                     <View style={styles.viewColumn}>
                       <Pressable 
                         style={styles.viewButton}
-                        onPress={() => {
+                        onPress={async () => {
                           setSelectedDelivery(delivery);
                           setShowDetailModal(true);
+                          await loadOrderDetails(delivery.id);
                         }}
                       >
                         <Text style={styles.viewIcon}>🔍</Text>
@@ -263,42 +329,56 @@ export default function CourierDeliveriesScreen() {
               onResponderRelease={(e) => e.stopPropagation()}
             >
               <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Delivery Details</Text>
+                <View style={styles.modalHeaderContent}>
+                  <Text style={styles.modalTitle}>DELIVERY DETAILS</Text>
+                  {orderDetail && (
+                    <Text style={styles.modalStatus}>
+                      Status: {getStatusText(orderDetail.status.toUpperCase())}
+                    </Text>
+                  )}
+                </View>
                 <Pressable 
                   onPress={() => setShowDetailModal(false)}
                   style={styles.closeButton}
                 >
-                  <Text style={styles.closeButtonText}>X</Text>
+                  <Text style={styles.closeButtonText}>✕</Text>
                 </Pressable>
               </View>
 
-              {selectedDelivery && (
+              {loadingDetail ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color="#DA583B" />
+                </View>
+              ) : orderDetail ? (
                 <View style={styles.modalBody}>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Order ID:</Text>
-                    <Text style={styles.detailValue}>{selectedDelivery.id}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Delivery Address:</Text>
-                    <Text style={styles.detailValue}>{selectedDelivery.address}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Status:</Text>
-                    <View style={[styles.statusBadge, getStatusStyle(selectedDelivery.status)]}>
-                      <Text style={styles.statusBadgeText}>
-                        {getStatusText(selectedDelivery.status)}
-                      </Text>
+                  <Text style={styles.detailText}>
+                    Delivery Address: {orderDetail.customer_address}
+                  </Text>
+                  
+                  <Text style={styles.detailText}>
+                    Restaurant: {orderDetail.restaurant_name}
+                  </Text>
+                  
+                  <Text style={styles.detailText}>
+                    Order Date: {formatDate(orderDetail.timestamp)}
+                  </Text>
+
+                  <Text style={styles.orderDetailsTitle}>Order Details:</Text>
+                  
+                  {orderDetail.products.map((product) => (
+                    <View key={product.id} style={styles.productRow}>
+                      <Text style={styles.productName}>{product.product_name}</Text>
+                      <Text style={styles.productQuantity}>x{product.quantity}</Text>
+                      <Text style={styles.productPrice}>$ {product.total_cost.toFixed(2)}</Text>
                     </View>
+                  ))}
+
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>TOTAL:</Text>
+                    <Text style={styles.totalValue}>$ {orderDetail.total_cost.toFixed(2)}</Text>
                   </View>
                 </View>
-              )}
-
-              <Pressable
-                style={styles.closeModalButton}
-                onPress={() => setShowDetailModal(false)}
-              >
-                <Text style={styles.closeModalButtonText}>CLOSE</Text>
-              </Pressable>
+              ) : null}
             </View>
           </Pressable>
         </Modal>
@@ -536,10 +616,20 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
+  modalHeaderContent: {
+    flex: 1,
+    alignItems: 'center',
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#DA583B',
+    marginBottom: 4,
+  },
+  modalStatus: {
+    fontSize: 15,
     color: '#FFFFFF',
+    fontWeight: '400',
   },
   closeButton: {
     padding: 4,
@@ -552,45 +642,57 @@ const styles = StyleSheet.create({
   modalBody: {
     padding: 24,
   },
-  detailRow: {
+  detailText: {
+    fontSize: 15,
+    color: '#222126',
+    marginBottom: 8,
+    fontWeight: '400',
+  },
+  orderDetailsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#222126',
+    marginTop: 20,
+    marginBottom: 12,
+  },
+  productRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-  detailLabel: {
+  productName: {
+    fontSize: 15,
+    color: '#222126',
+    flex: 2,
+  },
+  productQuantity: {
+    fontSize: 15,
+    color: '#222126',
+    flex: 1,
+    textAlign: 'center',
+  },
+  productPrice: {
+    fontSize: 15,
+    color: '#222126',
+    flex: 1,
+    textAlign: 'right',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingTop: 12,
+  },
+  totalLabel: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
     color: '#222126',
   },
-  detailValue: {
+  totalValue: {
     fontSize: 16,
-    color: '#666666',
-  },
-  statusBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-  },
-  statusBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 14,
     fontWeight: 'bold',
-  },
-  closeModalButton: {
-    backgroundColor: '#DA583B',
-    marginHorizontal: 24,
-    marginBottom: 24,
-    paddingVertical: 14,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  closeModalButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
+    color: '#222126',
   },
 });
