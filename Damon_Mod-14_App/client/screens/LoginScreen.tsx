@@ -14,6 +14,7 @@ type RootStackParamList = {
   };
   CustomerAccount: undefined;
   CourierAccount: undefined;
+  CourierDeliveries: undefined;
   Restaurants: undefined;
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Image, SafeAreaView, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -71,12 +71,12 @@ export default function CourierAccountScreen() {
             style={styles.logo}
             resizeMode="contain"
           />
-          <TouchableOpacity 
+          <Pressable 
             style={styles.logoutButton}
             onPress={handleLogout}
           >
             <Text style={styles.logoutText}>LOG OUT</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.content}>
@@ -114,7 +114,7 @@ export default function CourierAccountScreen() {
             />
             <Text style={styles.helperText}>Phone number for your Courier account.</Text>
 
-            <TouchableOpacity 
+            <Pressable 
               style={styles.updateButton}
               onPress={handleUpdateAccount}
               disabled={loading}
@@ -124,30 +124,27 @@ export default function CourierAccountScreen() {
               ) : (
                 <Text style={styles.updateButtonText}>UPDATE ACCOUNT</Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
 
       <View style={styles.bottomNav}>
-        <TouchableOpacity 
+        <Pressable 
           style={styles.navItem}
-          onPress={() => {
-            // TODO: Navigate to CourierDeliveries when implemented
-            console.log('Deliveries pressed');
-          }}
+          onPress={() => navigation.navigate('CourierDeliveries')}
         >
           <View style={styles.navIcon}>
             <Text style={styles.navIconText}>🚗</Text>
           </View>
           <Text style={styles.navLabel}>Deliveries</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        </Pressable>
+        <Pressable style={styles.navItem}>
           <View style={[styles.navIcon, styles.navIconActive]}>
             <Text style={styles.navIconText}>👤</Text>
           </View>
           <Text style={styles.navLabel}>Account</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
