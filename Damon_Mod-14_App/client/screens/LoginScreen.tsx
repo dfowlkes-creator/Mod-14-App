@@ -12,6 +12,8 @@ type RootStackParamList = {
     customerId?: number;
     courierId?: number;
   };
+  CustomerAccount: undefined;
+  CourierAccount: undefined;
   Restaurants: undefined;
 };
 
@@ -61,12 +63,12 @@ export default function LoginScreen() {
           // Only customer account, navigate directly to customer app
           (global as any).customerId = response.customer_id;
           (global as any).accountType = 'customer';
-          navigation.navigate('Restaurants');
+          navigation.navigate('CustomerAccount');
         } else if (hasCourierAccount) {
           // Only courier account, navigate directly to courier app
           (global as any).courierId = response.courier_id;
           (global as any).accountType = 'courier';
-          navigation.navigate('Restaurants'); // Placeholder - will be courier screen
+          navigation.navigate('CourierAccount');
         } else {
           setError('No account found. Please contact support.');
         }

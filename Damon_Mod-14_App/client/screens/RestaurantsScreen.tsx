@@ -1,5 +1,17 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image, Modal, ActivityIndicator, SafeAreaView, Platform, StatusBar } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  Image,
+  ActivityIndicator,
+  SafeAreaView,
+  Platform,
+  StatusBar,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { restaurantService } from '../services/apiService';
@@ -8,6 +20,12 @@ type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Details: undefined;
+  AccountTypeSelection: {
+    customerId?: number;
+    courierId?: number;
+  };
+  CustomerAccount: undefined;
+  CourierAccount: undefined;
   Restaurants: undefined;
   RestaurantMenu: { restaurant: any };
   OrderHistory: undefined;
@@ -22,44 +40,34 @@ interface Restaurant {
 }
 
 const restaurantImages: { [key: string]: any } = {
-  'Greek': require('../assets/Images/Restaurants/cuisineGreek.jpg'),
-  'Japanese': require('../assets/Images/Restaurants/cuisineJapanese.jpg'),
-  'Southeast': require('../assets/Images/Restaurants/cuisineSoutheast.jpg'),
-  'Vietnamese': require('../assets/Images/Restaurants/cuisineViet.jpg'),
-  'Pizza': require('../assets/Images/Restaurants/cuisinePizza.jpg'),
-  'Pasta': require('../assets/Images/Restaurants/cuisinePasta.jpg'),
-  'default': require('../assets/Images/RestaurantMenu.jpg'),
+  Greek: require('../assets/Images/Restaurants/cuisineGreek.jpg'),
+  Japanese: require('../assets/Images/Restaurants/cuisineJapanese.jpg'),
+  Southeast: require('../assets/Images/Restaurants/cuisineSoutheast.jpg'),
+  Vietnamese: require('../assets/Images/Restaurants/cuisineViet.jpg'),
+  Pizza: require('../assets/Images/Restaurants/cuisinePizza.jpg'),
+  Pasta: require('../assets/Images/Restaurants/cuisinePasta.jpg'),
+  default: require('../assets/Images/RestaurantMenu.jpg'),
 };
 
-/**
- * Maps price_range integer (1-3) to visual dollar signs ($, $$, $$$)
- */
 const getPriceString = (priceRange: number): string => {
   return '$'.repeat(priceRange);
 };
 
-/**
- * Selects restaurant image based on cuisine keywords in name
- * Falls back to default menu image if no keyword match
- */
 const getRestaurantImage = (name: string) => {
   const nameLower = name.toLowerCase();
   if (nameLower.includes('greek')) return restaurantImages.Greek;
   if (nameLower.includes('japanese')) return restaurantImages.Japanese;
-  if (nameLower.includes('dragon') || nameLower.includes('southeast')) return restaurantImages.Southeast;
+  if (nameLower.includes('dragon') || nameLower.includes('southeast'))
+    return restaurantImages.Southeast;
   if (nameLower.includes('viet')) return restaurantImages.Vietnamese;
   if (nameLower.includes('pizza')) return restaurantImages.Pizza;
   if (nameLower.includes('pasta')) return restaurantImages.Pasta;
   return restaurantImages.default;
 };
 
-/**
- * RestaurantsScreen - Displays filterable list of restaurants
- * Supports filtering by star rating (3-5) and price range (1-3)
- * Reloads data when filters change or screen comes into focus
- */
 export default function RestaurantsScreen() {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +80,10 @@ export default function RestaurantsScreen() {
     try {
       setLoading(true);
       setError(null);
-      const data = await restaurantService.getAll(selectedRating || undefined, selectedPrice || undefined);
+      const data = await restaurantService.getAll(
+        selectedRating || undefined,
+        selectedPrice || undefined
+      );
       setRestaurants(data);
     } catch (err) {
       console.error('Error loading restaurants:', err);
@@ -103,204 +114,224 @@ export default function RestaurantsScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require('../assets/Images/AppLogoV1.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.logoutText}>LOG OUT</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.titleSection}>
-        <Text style={styles.sectionTitle}>NEARBY RESTAURANTS</Text>
-      </View>
-
-      <View style={styles.filterSection}>
-        <View style={styles.filterColumn}>
-          <Text style={styles.filterLabel}>Rating</Text>
-          <TouchableOpacity 
-            style={styles.filterButton}
-            onPress={() => setShowRatingModal(true)}
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            source={require('../assets/Images/AppLogoV1.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Pressable
+            style={styles.logoutButton}
+            onPress={() => navigation.navigate('Login')}
           >
-            <Text style={styles.filterButtonText}>
-              {selectedRating ? renderStars(selectedRating) : '-- Select --'}
-            </Text>
-            <Text style={styles.dropdownArrow}>▼</Text>
-          </TouchableOpacity>
+            <Text style={styles.logoutText}>LOG OUT</Text>
+          </Pressable>
         </View>
-        <View style={styles.filterColumn}>
-          <Text style={styles.filterLabel}>Price</Text>
-          <TouchableOpacity 
-            style={styles.filterButton}
-            onPress={() => setShowPriceModal(true)}
-          >
-            <Text style={styles.filterButtonText}>
-              {selectedPrice ? getPriceString(selectedPrice) : '-- Select --'}
-            </Text>
-            <Text style={styles.dropdownArrow}>▼</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
 
-      <View style={styles.restaurantsTitleSection}>
-        <Text style={styles.restaurantsTitle}>RESTAURANTS</Text>
-      </View>
+        {/* Title */}
+        <View style={styles.titleSection}>
+          <Text style={styles.sectionTitle}>NEARBY RESTAURANTS</Text>
+        </View>
 
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#DA583B" />
-          <Text style={styles.loadingText}>Loading restaurants...</Text>
-        </View>
-      ) : error ? (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={loadRestaurants}>
-            <Text style={styles.retryButtonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      ) : filteredRestaurants.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No restaurants found</Text>
-          <Text style={styles.emptySubtext}>Try adjusting your filters</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredRestaurants}
-          keyExtractor={item => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.listContainer}
-          columnWrapperStyle={styles.row}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={styles.card}
-              onPress={() => handleRestaurantPress(item)}
+        {/* Filters */}
+        <View style={styles.filterSection}>
+          <View style={styles.filterColumn}>
+            <Text style={styles.filterLabel}>Rating</Text>
+            <Pressable
+              style={styles.filterButton}
+              onPress={() => setShowRatingModal(true)}
             >
-              <Image source={getRestaurantImage(item.name)} style={styles.restaurantImage} />
-              <View style={styles.cardContent}>
-                <Text style={styles.restaurantName}>{item.name}</Text>
-                <Text style={styles.stars}>{renderStars(item.rating)}</Text>
-                <Text style={styles.priceText}>{getPriceString(item.price_range)}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      )}
-
-      {/* Rating Filter Modal */}
-      <Modal
-        visible={showRatingModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowRatingModal(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowRatingModal(false)}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Rating</Text>
-            <TouchableOpacity 
-              style={styles.modalOption}
-              onPress={() => {
-                setSelectedRating(null);
-                setShowRatingModal(false);
-              }}
+              <Text style={styles.filterButtonText}>
+                {selectedRating
+                  ? renderStars(selectedRating)
+                  : '-- Select --'}
+              </Text>
+              <Text style={styles.dropdownArrow}>▼</Text>
+            </Pressable>
+          </View>
+          <View style={styles.filterColumn}>
+            <Text style={styles.filterLabel}>Price</Text>
+            <Pressable
+              style={styles.filterButton}
+              onPress={() => setShowPriceModal(true)}
             >
-              <Text style={styles.modalOptionText}>All Ratings</Text>
+              <Text style={styles.filterButtonText}>
+                {selectedPrice
+                  ? getPriceString(selectedPrice)
+                  : '-- Select --'}
+              </Text>
+              <Text style={styles.dropdownArrow}>▼</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Restaurants header */}
+        <View style={styles.restaurantsTitleSection}>
+          <Text style={styles.restaurantsTitle}>RESTAURANTS</Text>
+        </View>
+
+        {/* Content */}
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#DA583B" />
+            <Text style={styles.loadingText}>Loading restaurants...</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={loadRestaurants}
+            >
+              <Text style={styles.retryButtonText}>Retry</Text>
             </TouchableOpacity>
-            {[3, 4, 5].map(rating => (
+          </View>
+        ) : filteredRestaurants.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No restaurants found</Text>
+            <Text style={styles.emptySubtext}>
+              Try adjusting your filters
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredRestaurants}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.listContainer}
+            columnWrapperStyle={styles.row}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item }) => (
               <TouchableOpacity
-                key={rating}
+                style={styles.card}
+                onPress={() => handleRestaurantPress(item)}
+              >
+                <Image
+                  source={getRestaurantImage(item.name)}
+                  style={styles.restaurantImage}
+                />
+                <View style={styles.cardContent}>
+                  <Text style={styles.restaurantName}>{item.name}</Text>
+                  <Text style={styles.stars}>
+                    {renderStars(item.rating)}
+                  </Text>
+                  <Text style={styles.priceText}>
+                    {getPriceString(item.price_range)}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        )}
+
+        {/* Rating Filter "Modal" */}
+        {showRatingModal && (
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setShowRatingModal(false)}
+          >
+            <View
+              style={styles.modalContent}
+              // prevent press on content from closing
+              onStartShouldSetResponder={() => true}
+            >
+              <Text style={styles.modalTitle}>Select Rating</Text>
+              <Pressable
                 style={styles.modalOption}
                 onPress={() => {
-                  setSelectedRating(rating);
+                  setSelectedRating(null);
                   setShowRatingModal(false);
                 }}
               >
-                <Text style={styles.modalOptionText}>{rating} Stars</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+                <Text style={styles.modalOptionText}>All Ratings</Text>
+              </Pressable>
+              {[3, 4, 5].map((rating) => (
+                <Pressable
+                  key={rating}
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setSelectedRating(rating);
+                    setShowRatingModal(false);
+                  }}
+                >
+                  <Text style={styles.modalOptionText}>
+                    {rating} Stars
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </Pressable>
+        )}
 
-      {/* Price Filter Modal */}
-      <Modal
-        visible={showPriceModal}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowPriceModal(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowPriceModal(false)}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Select Price</Text>
-            <TouchableOpacity 
-              style={styles.modalOption}
-              onPress={() => {
-                setSelectedPrice(null);
-                setShowPriceModal(false);
-              }}
+        {/* Price Filter "Modal" */}
+        {showPriceModal && (
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setShowPriceModal(false)}
+          >
+            <View
+              style={styles.modalContent}
+              onStartShouldSetResponder={() => true}
             >
-              <Text style={styles.modalOptionText}>All Prices</Text>
-            </TouchableOpacity>
-            {[1, 2, 3].map(price => (
-              <TouchableOpacity
-                key={price}
+              <Text style={styles.modalTitle}>Select Price</Text>
+              <Pressable
                 style={styles.modalOption}
                 onPress={() => {
-                  setSelectedPrice(price);
+                  setSelectedPrice(null);
                   setShowPriceModal(false);
                 }}
               >
-                <Text style={styles.modalOptionText}>{getPriceString(price)}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+                <Text style={styles.modalOptionText}>All Prices</Text>
+              </Pressable>
+              {[1, 2, 3].map((price) => (
+                <Pressable
+                  key={price}
+                  style={styles.modalOption}
+                  onPress={() => {
+                    setSelectedPrice(price);
+                    setShowPriceModal(false);
+                  }}
+                >
+                  <Text style={styles.modalOptionText}>
+                    {getPriceString(price)}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </Pressable>
+        )}
 
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem}>
-          <View style={[styles.navIcon, styles.navIconActive]}>
-            <Text style={styles.navIconText}>🍔</Text>
-          </View>
-          <Text style={styles.navLabel}>Restaurants</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem}
-          onPress={() => navigation.navigate('OrderHistory')}
-        >
-          <View style={styles.navIcon}>
-            <Text style={styles.navIconText}>🕐</Text>
-          </View>
-          <Text style={styles.navLabel}>OrderHistory</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.navItem}
-          onPress={() => {
-            // TODO: Navigate to Account screen when implemented
-            console.log('Account pressed');
-          }}
-        >
-          <View style={styles.navIcon}>
-            <Text style={styles.navIconText}>👤</Text>
-          </View>
-          <Text style={styles.navLabel}>Account</Text>
-        </TouchableOpacity>
+        {/* Bottom nav */}
+        <View style={styles.bottomNav}>
+          <Pressable style={styles.navItem}>
+            <View style={[styles.navIcon, styles.navIconActive]}>
+              <Text style={styles.navIconText}>🍔</Text>
+            </View>
+            <Text style={styles.navLabel}>Restaurants</Text>
+          </Pressable>
+          <Pressable
+            style={styles.navItem}
+            onPress={() => navigation.navigate('OrderHistory')}
+          >
+            <View style={styles.navIcon}>
+              <Text style={styles.navIconText}>🕐</Text>
+            </View>
+            <Text style={styles.navLabel}>OrderHistory</Text>
+          </Pressable>
+          <Pressable
+            style={styles.navItem}
+            onPress={() => {
+              console.log('Account pressed');
+            }}
+          >
+            <View style={styles.navIcon}>
+              <Text style={styles.navIconText}>👤</Text>
+            </View>
+            <Text style={styles.navLabel}>Account</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
     </SafeAreaView>
   );
 }
@@ -319,7 +350,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 12 : 12,
+    paddingTop:
+      Platform.OS === 'android'
+        ? (StatusBar.currentHeight || 0) + 12
+        : 12,
     paddingBottom: 12,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
@@ -519,10 +553,16 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9999,
+    elevation: 9999,
   },
   modalContent: {
     backgroundColor: '#FFFFFF',

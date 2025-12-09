@@ -13,6 +13,8 @@ type RootStackParamList = {
 };
 import LoginScreen from './screens/LoginScreen';
 import AccountTypeSelectionScreen from './screens/AccountTypeSelectionScreen';
+import CustomerAccountScreen from './screens/CustomerAccountScreen';
+import CourierAccountScreen from './screens/CourierAccountScreen';
 import RestaurantsScreen from './screens/RestaurantsScreen';
 import RestaurantMenuScreen from './screens/RestaurantMenuScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
@@ -32,6 +34,8 @@ export default function App() {
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="AccountTypeSelection" component={AccountTypeSelectionScreen} />
+        <Stack.Screen name="CustomerAccount" component={CustomerAccountScreen} />
+        <Stack.Screen name="CourierAccount" component={CourierAccountScreen} />
         <Stack.Screen name="Restaurants" component={RestaurantsScreen} />
         <Stack.Screen name="RestaurantMenu" component={RestaurantMenuScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />

@@ -10,8 +10,9 @@ type RootStackParamList = {
     customerId?: number;
     courierId?: number;
   };
+  CustomerAccount: undefined;
+  CourierAccount: undefined;
   Restaurants: undefined;
-  CourierApp: undefined;
 };
 
 type AccountTypeSelectionRouteProp = RouteProp<
@@ -33,7 +34,7 @@ export default function AccountTypeSelectionScreen() {
     if (customerId) {
       (global as any).customerId = customerId;
       (global as any).accountType = 'customer';
-      navigation.navigate('Restaurants');
+      navigation.navigate('CustomerAccount');
     }
   };
 
@@ -41,8 +42,7 @@ export default function AccountTypeSelectionScreen() {
     if (courierId) {
       (global as any).courierId = courierId;
       (global as any).accountType = 'courier';
-      // TODO: navigate to courier flow when implemented
-      navigation.navigate('Restaurants');
+      navigation.navigate('CourierAccount');
     }
   };
 
