@@ -40,6 +40,8 @@ export interface CreateOrderRequest {
     id: number;
     quantity: number;
   }>;
+  sendSMS?: boolean;
+  sendEmail?: boolean;
 }
 
 export interface Order {
