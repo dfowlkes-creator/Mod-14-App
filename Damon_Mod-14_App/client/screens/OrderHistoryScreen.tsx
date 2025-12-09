@@ -219,6 +219,15 @@ export default function OrderHistoryScreen() {
           </View>
           <Text style={styles.navLabel}>OrderHistory</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate('CustomerAccount')}
+        >
+          <View style={styles.navIcon}>
+            <Text style={styles.navIconText}>👤</Text>
+          </View>
+          <Text style={styles.navLabel}>Account</Text>
+        </TouchableOpacity>
       </View>
     </View>
     </SafeAreaView>

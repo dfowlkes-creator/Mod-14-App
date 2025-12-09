@@ -61,15 +61,15 @@ export default function LoginScreen() {
             courierId: response.courier_id,
           });
         } else if (hasCustomerAccount) {
-          // Only customer account, navigate directly to customer app
+          // Only customer account, navigate directly to Restaurants screen
           (global as any).customerId = response.customer_id;
           (global as any).accountType = 'customer';
-          navigation.navigate('CustomerAccount');
+          navigation.navigate('Restaurants');
         } else if (hasCourierAccount) {
-          // Only courier account, navigate directly to courier app
+          // Only courier account, navigate directly to Courier Deliveries screen
           (global as any).courierId = response.courier_id;
           (global as any).accountType = 'courier';
-          navigation.navigate('CourierAccount');
+          navigation.navigate('CourierDeliveries');
         } else {
           setError('No account found. Please contact support.');
         }

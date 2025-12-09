@@ -322,7 +322,7 @@ export default function RestaurantsScreen() {
           <Pressable
             style={styles.navItem}
             onPress={() => {
-              console.log('Account pressed');
+              navigation.navigate('CustomerAccount');
             }}
           >
             <View style={styles.navIcon}>

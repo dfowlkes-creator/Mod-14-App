@@ -34,7 +34,7 @@ export default function AccountTypeSelectionScreen() {
     if (customerId) {
       (global as any).customerId = customerId;
       (global as any).accountType = 'customer';
-      navigation.navigate('CustomerAccount');
+      navigation.navigate('Restaurants');
     }
   };
 
@@ -42,7 +42,7 @@ export default function AccountTypeSelectionScreen() {
     if (courierId) {
       (global as any).courierId = courierId;
       (global as any).accountType = 'courier';
-      navigation.navigate('CourierAccount');
+      navigation.navigate('CourierDeliveries');
     }
   };
 
