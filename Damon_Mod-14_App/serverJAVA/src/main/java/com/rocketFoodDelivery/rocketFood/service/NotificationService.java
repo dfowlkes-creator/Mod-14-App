@@ -1,6 +1,9 @@
 package com.rocketFoodDelivery.rocketFood.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import org.springframework.stereotype.Service;
 
 import com.rocketFoodDelivery.rocketFood.dtos.ApiOrderDTO;
@@ -27,13 +30,17 @@ public class NotificationService {
     private String notifyTemplateId;
 
     public void sendSmsNotification(String to, String message) {
-        // Twilio.init(accountSid, authToken);
-
-        // Message.creator(
-        // new PhoneNumber(to),
-        // new PhoneNumber(phoneNumber),
-        // message
-        // ).create();
+        try {
+            Twilio.init(accountSid, authToken);
+            Message.creator(
+                    new PhoneNumber(to),
+                    new PhoneNumber(phoneNumber),
+                    message).create();
+        } catch (Exception e) {
+            System.err.println("Twilio SMS error: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to send SMS: " + e.getMessage(), e);
+        }
     }
 
     public void sendEmailNotification(String customerEmail, ApiOrderDTO orderDTO) {

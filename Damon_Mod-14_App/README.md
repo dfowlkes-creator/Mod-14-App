@@ -1,3 +1,59 @@
+# Mod 14 App - Rocket Food Delivery
+
+## Overview
+
+This project is a food delivery application supporting customer and courier roles, with dual-role support and robust order/delivery management. The app is built with React Native (Expo) for the client and Java Spring Boot for the backend.
+
+## APIs Used
+
+- The README file outlines the APIs that will be used in the project.
+
+## User Flow & Navigation
+
+- Upon entering correct credentials:
+  - If the user has only a customer account, they will be directed to the customer application.
+  - If the user has only a courier account, they will be directed to the courier application.
+  - If the user has both customer and courier accounts, they will be directed to the Account Selection Page.
+- On the Account Selection Page:
+  - Selecting the customer account will direct the user to the customer application.
+  - Selecting the courier account will direct the user to the courier application.
+
+## Order Status & Delivery
+
+- The order status is a clickable button. Clicking the status button advances it to the next stage. These changes are reflected in the database.
+- The delivery status progresses from "PENDING" (red) to "IN PROGRESS" (orange) to "DELIVERED" (green).
+- Once an order's status is set to "DELIVERED", further changes to the status are disabled.
+- Clicking a button under the 'View' column opens a Delivery Detail modal for the respective delivery.
+- The fields display user email, user-type email, and user-type phone based on their role as either a Courier or Customer, as recorded in the database.
+- Users can edit their user-type email and phone, while the user email field is read-only. These changes are reflected in the database.
+- Users have the option to request order confirmation via checkbox for text message (phone) and/or email.
+- `sendSMS` and `sendEmail` boolean parameters have been added to the order object and are now included in POST requests to the order endpoint.
+
+## UI/UX & Design
+
+- Fonts used in the mobile application: Arial and Oswald.
+- The page is scrollable if the content overflows.
+- The Header and Footer Navigation are always visible except on the Account Selection Page.
+- Footer Navigation / Customer Account: Contains three tabs (Restaurants, Order History, Accounts).
+- Footer Navigation / Courier Account: Contains two tabs (Order Delivery, Accounts).
+- Rocket Food Delivery Colors Scheme is respected.
+- General aspects of the mobile app are consistent: Header with logo and logout button, Main section in the middle & Footer with navigation tabs.
+
+## Wireframes
+
+- Account Selection Page wireframe is respected.
+- Order Confirmation Modal wireframe is respected (updated with checkbox for email and SMS notifications).
+- Order History Page wireframe is respected.
+- Delivery History Detail Modal wireframe is respected.
+- Delivery History Page wireframe is respected.
+- Account Settings wireframe is respected.
+
+## Code Quality & Structure
+
+- Components are reused across different parts of the project (multiple reusable components).
+- The code is well-commented, with no unused or dead code.
+- Folders and files are well organized, maintaining a clear structure.
+
 # Rocket Food Delivery - Mobile Application
 
 ## Project Overview
