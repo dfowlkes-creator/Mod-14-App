@@ -130,7 +130,7 @@
     	<dependency>
     	    <groupId>org.apache.httpcomponents</groupId>
     	    <artifactId>httpclient</artifactId>
-    	    <version>4.5.13</version> <!-- Remplacez par la dernière version stable si nécessaire -->
+			<version>4.5.13</version> <!-- Replace with the latest stable version if necessary -->
     	</dependency>
 		<dependency>
 		    <groupId>org.springframework.boot</groupId>
