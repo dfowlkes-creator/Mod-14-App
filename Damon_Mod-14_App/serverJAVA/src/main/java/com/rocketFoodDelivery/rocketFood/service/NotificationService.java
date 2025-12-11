@@ -30,55 +30,15 @@ public class NotificationService {
     private String notifyTemplateId;
 
     public void sendSmsNotification(String to, String message) {
-        try {
-            Twilio.init(accountSid, authToken);
-            Message.creator(
-                    new PhoneNumber(to),
-                    new PhoneNumber(phoneNumber),
-                    message).create();
-        } catch (Exception e) {
-            System.err.println("Twilio SMS error: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send SMS: " + e.getMessage(), e);
-        }
+            // Dummy placeholder for SMS notification
+            System.out.println("[DUMMY SMS] To: +1234567890 | Message: Your order has been placed successfully! (This is a test notification)");
     }
 
     public void sendEmailNotification(String customerEmail, ApiOrderDTO orderDTO) {
-        // HttpClient client = HttpClient.newHttpClient();
-        // String url = "https://api.notify.eu/notification/send";
-
-        // String payload = String.format(
-        // "{ \"message\": { \"notificationType\": \"%s\", \"language\": \"en\",
-        // \"params\": { \"order_id\": \"%d\", \"customer_name\": \"%s\",
-        // \"restaurant_name\": \"%s\", \"order_total_cost\": \"%s\" }, \"transport\":
-        // [{ \"type\": \"SMTP\", \"recipients\": { \"to\": [{ \"name\": \"%s\",
-        // \"recipient\": \"%s\" }] } }] } }",
-        // notifyTemplateId,
-        // orderDTO.getId(),
-        // orderDTO.getCustomer_name(),
-        // orderDTO.getRestaurant_name(),
-        // formatCentsToCurrency(orderDTO.getTotal_cost()),
-        // orderDTO.getCustomer_name(),
-        // customerEmail
-
-        // );
-
-        // HttpRequest request = HttpRequest.newBuilder()
-        // .uri(URI.create(url))
-        // .header("Content-Type", "application/json")
-        // .header("X-ClientId", notifyClientId)
-        // .header("X-SecretKey", notifySecretKey)
-        // .POST(HttpRequest.BodyPublishers.ofString(payload))
-        // .build();
-
-        // try {
-        // HttpResponse<String> response = client.send(request,
-        // HttpResponse.BodyHandlers.ofString());
-        // if (response.statusCode() != 200) {
-        // throw new RuntimeException("Failed to send email notification");
-        // }
-        // } catch (Exception e) {
-        // throw new RuntimeException("Failed to send email notification", e);
-        // }
+        System.out.println();
+        System.out.println("Thank you, John Doe!\n");
+        System.out.println("We have received your Order (ID: #111) for the Restaurant: Amazing Greek and with a total cost of $20.00. We are currently processing your order and will soon be on our way to deliver to you.\n");
+        System.out.println("Sincerely,\nRocket Food Delivery");
+        System.out.println();
     }
 }
