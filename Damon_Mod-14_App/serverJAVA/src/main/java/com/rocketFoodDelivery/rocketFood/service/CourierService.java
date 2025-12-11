@@ -97,6 +97,7 @@ public class CourierService {
                 .user_id(courier.getUserEntity() != null ? courier.getUserEntity().getId() : 0)
                 .build();
     }
+
     public Optional<ApiCourierDTO> updateCourier(int id, CourierUpdateDTO updateDTO) {
         Optional<Courier> courierOpt = courierRepository.findById(id);
         if (courierOpt.isEmpty()) {

@@ -7,12 +7,15 @@ public class CourierUpdateDTO {
     public String getCourierEmail() {
         return courierEmail;
     }
+
     public void setCourierEmail(String courierEmail) {
         this.courierEmail = courierEmail;
     }
+
     public String getCourierPhone() {
         return courierPhone;
     }
+
     public void setCourierPhone(String courierPhone) {
         this.courierPhone = courierPhone;
     }
