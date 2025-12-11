@@ -13,6 +13,7 @@ type RootStackParamList = {
   CustomerAccount: undefined;
   CourierAccount: undefined;
   Restaurants: undefined;
+  CourierDeliveries: undefined;
 };
 
 type AccountTypeSelectionRouteProp = RouteProp<

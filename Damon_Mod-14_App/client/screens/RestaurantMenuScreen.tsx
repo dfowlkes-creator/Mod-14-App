@@ -178,7 +178,7 @@ export default function RestaurantMenuScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Image
-            source={require('../assets/Images/AppLogoV1.png')}
+            source={require('../assets/Images/RestaurantMenu.jpg')}
             style={styles.logo}
             resizeMode="contain"
           />

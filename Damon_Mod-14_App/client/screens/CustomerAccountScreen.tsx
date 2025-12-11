@@ -27,28 +27,38 @@ export default function CustomerAccountScreen() {
     loadCustomerData();
   }, []);
 
-  const loadCustomerData = async () => {
-    try {
-      setLoading(true);
-      const customerId = (global as any).customerId;
-      
-      // TODO: Fetch customer data from API
-      // For now, using placeholder data
-      setPrimaryEmail('erica.ger@gmail.com');
-      setCustomerEmail('miguelina_powlowski.edit@adams.org');
-      setCustomerPhone('817-268-8862');
-    } catch (error) {
-      console.error('Error loading customer data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+ const loadCustomerData = async () => {
+  try {
+    setLoading(true);
+    const customerId = (global as any).customerId;
+    const response = await fetch(`http://10.0.2.2:8080/api/customers/${customerId}`);
+    if (!response.ok) throw new Error('Failed to fetch customer data');
+    const data = await response.json();
+    setPrimaryEmail(data.email); // or set from userEntity if needed
+    setCustomerEmail(data.email);
+    setCustomerPhone(data.phone);
+  } catch (error) {
+    console.error('Error loading customer data:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleUpdateAccount = async () => {
     try {
       setLoading(true);
-      // TODO: Implement account update API call
-      console.log('Updating account:', { customerEmail, customerPhone });
+      const customerId = (global as any).customerId;
+      const response = await fetch(`http://10.0.2.2:8080/api/customers/${customerId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          customerEmail,
+          customerPhone,
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to update account');
       alert('Account updated successfully!');
     } catch (error) {
       console.error('Error updating account:', error);
