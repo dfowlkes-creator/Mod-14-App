@@ -1,6 +1,7 @@
 package com.rocketFoodDelivery.rocketFood.controller.api;
 
 import com.rocketFoodDelivery.rocketFood.dtos.ApiCourierDTO;
+import com.rocketFoodDelivery.rocketFood.dtos.CourierUpdateDTO;
 import com.rocketFoodDelivery.rocketFood.service.CourierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,23 @@ public class CourierApiController {
         }
 
         return ResponseEntity.ok(courier.get());
+    }
+
+    /**
+     * Update courier information (email, phone)
+     *
+     * @param id        - Courier ID
+     * @param updateDTO - DTO with fields to update
+     * @return ResponseEntity with updated courier details or error message
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCourier(@PathVariable int id, @RequestBody CourierUpdateDTO updateDTO) {
+        Optional<ApiCourierDTO> updated = courierService.updateCourier(id, updateDTO);
+        if (updated.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Courier not found"));
+        }
+        return ResponseEntity.ok(updated.get());
     }
 
     /**

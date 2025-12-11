@@ -27,11 +27,19 @@ export default function CustomerAccountScreen() {
     loadCustomerData();
   }, []);
 
+ const getApiBaseUrl = () => {
+   if (Platform.OS === 'android') {
+     return 'http://10.0.2.2:8080';
+   } else {
+     return 'http://10.0.0.200:8080'; // <-- Replace with your computer's local IP
+   }
+ };
+
  const loadCustomerData = async () => {
   try {
     setLoading(true);
     const customerId = (global as any).customerId;
-    const response = await fetch(`http://10.0.2.2:8080/api/customers/${customerId}`);
+    const response = await fetch(`${getApiBaseUrl()}/api/customers/${customerId}`);
     if (!response.ok) throw new Error('Failed to fetch customer data');
     const data = await response.json();
     setPrimaryEmail(data.email); // or set from userEntity if needed
@@ -48,7 +56,7 @@ export default function CustomerAccountScreen() {
     try {
       setLoading(true);
       const customerId = (global as any).customerId;
-      const response = await fetch(`http://10.0.2.2:8080/api/customers/${customerId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/customers/${customerId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

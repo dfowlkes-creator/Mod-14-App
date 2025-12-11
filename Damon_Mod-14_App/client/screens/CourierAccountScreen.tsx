@@ -25,16 +25,24 @@ export default function CourierAccountScreen() {
     loadCourierData();
   }, []);
 
+  const getApiBaseUrl = () => {
+    if (Platform.OS === 'android') {
+      return 'http://10.0.2.2:8080';
+    } else {
+      return 'http://10.0.0.200:8080'; // <-- Replace with your computer's local IP
+    }
+  };
+
   const loadCourierData = async () => {
     try {
       setLoading(true);
       const courierId = (global as any).courierId;
-      
-      // TODO: Fetch courier data from API using /api/couriers/{courierId}
-      // For now, using placeholder data
-      setPrimaryEmail('erica.ger@gmail.com');
-      setCourierEmail('erica.ger.courier@gmail.com');
-      setCourierPhone('789-101-1234');
+      const response = await fetch(`${getApiBaseUrl()}/api/couriers/${courierId}`);
+      if (!response.ok) throw new Error('Failed to fetch courier data');
+      const data = await response.json();
+      setPrimaryEmail(data.email); // or set from userEntity if needed
+      setCourierEmail(data.email);
+      setCourierPhone(data.phone);
     } catch (error) {
       console.error('Error loading courier data:', error);
     } finally {
@@ -43,18 +51,30 @@ export default function CourierAccountScreen() {
   };
 
   const handleUpdateAccount = async () => {
-    try {
-      setLoading(true);
-      // TODO: Implement courier account update API call
-      console.log('Updating courier account:', { courierEmail, courierPhone });
-      alert('Account updated successfully!');
-    } catch (error) {
-      console.error('Error updating account:', error);
-      alert('Failed to update account');
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const courierId = (global as any).courierId;
+    const response = await fetch(`${getApiBaseUrl()}/api/couriers/${courierId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        courierEmail,
+        courierPhone,
+      }),
+    });
+    if (!response.ok) throw new Error('Failed to update account');
+    alert('Account updated successfully!');
+    // Optionally reload data:
+    await loadCourierData();
+  } catch (error) {
+    console.error('Error updating account:', error);
+    alert('Failed to update account');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleLogout = () => {
     (global as any).courierId = null;

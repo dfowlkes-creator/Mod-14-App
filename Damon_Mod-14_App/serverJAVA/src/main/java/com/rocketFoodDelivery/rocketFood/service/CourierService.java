@@ -1,6 +1,7 @@
 package com.rocketFoodDelivery.rocketFood.service;
 
 import com.rocketFoodDelivery.rocketFood.dtos.ApiCourierDTO;
+import com.rocketFoodDelivery.rocketFood.dtos.CourierUpdateDTO;
 import com.rocketFoodDelivery.rocketFood.models.Courier;
 import com.rocketFoodDelivery.rocketFood.repository.CourierRepository;
 import com.rocketFoodDelivery.rocketFood.repository.CourierStatusRepository;
@@ -95,5 +96,20 @@ public class CourierService {
                 .active(courier.isActive())
                 .user_id(courier.getUserEntity() != null ? courier.getUserEntity().getId() : 0)
                 .build();
+    }
+    public Optional<ApiCourierDTO> updateCourier(int id, CourierUpdateDTO updateDTO) {
+        Optional<Courier> courierOpt = courierRepository.findById(id);
+        if (courierOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        Courier courier = courierOpt.get();
+        if (updateDTO.getCourierEmail() != null) {
+            courier.setEmail(updateDTO.getCourierEmail());
+        }
+        if (updateDTO.getCourierPhone() != null) {
+            courier.setPhone(updateDTO.getCourierPhone());
+        }
+        courierRepository.save(courier);
+        return Optional.of(convertToDTO(courier));
     }
 }
