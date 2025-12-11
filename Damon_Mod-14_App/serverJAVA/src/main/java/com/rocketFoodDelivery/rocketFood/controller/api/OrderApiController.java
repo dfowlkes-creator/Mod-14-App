@@ -61,6 +61,8 @@ public class OrderApiController {
                                 .body(Collections.singletonMap("error", "Invalid user id"));
                     }
                     orders = orderService.getOrdersByCourierId(id);
+                    // Sort orders in descending order by order ID
+                    orders.sort((o1, o2) -> Integer.compare(o2.getId(), o1.getId()));
                     break;
                 default:
                     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
