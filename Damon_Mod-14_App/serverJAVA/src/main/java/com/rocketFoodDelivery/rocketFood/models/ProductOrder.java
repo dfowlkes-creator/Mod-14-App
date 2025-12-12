@@ -16,21 +16,29 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/**
+ * Entity representing the association between a Product and an Order.
+ * Captures quantity, unit cost, and enforces product-restaurant relationship
+ * integrity.
+ * Used for persistence and business logic related to ordered products.
+ */
 @Entity
-@Table(name = "product_orders" , uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"product_id", "order_id"})
+@Table(name = "product_orders", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "product_id", "order_id" })
 })
 public class ProductOrder {
+    /** Unique identifier for the product-order association. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    /** Product included in the order. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "product_id")
     private Product product;
 
-
+    /** Order to which the product belongs. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
@@ -38,8 +46,10 @@ public class ProductOrder {
     @JsonBackReference
     private Order order;
 
+    /** Quantity of the product ordered. */
     @Min(1)
     private Integer product_quantity;
+    /** Unit cost of the product at the time of order. */
     @Min(0)
     private Integer product_unit_cost;
 
@@ -51,8 +61,8 @@ public class ProductOrder {
     }
 
     private boolean productBelongsToRestaurant() {
-        if (product == null || order == null || 
-            product.getRestaurant() == null || order.getRestaurant() == null) {
+        if (product == null || order == null ||
+                product.getRestaurant() == null || order.getRestaurant() == null) {
             return false;
         }
         // THIS LINE FAILS - products belong to different restaurants than the order
@@ -69,4 +79,3 @@ public class ProductOrder {
     }
 
 }
-

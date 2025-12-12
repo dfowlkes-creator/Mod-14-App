@@ -40,6 +40,8 @@ export interface CreateOrderRequest {
     id: number;
     quantity: number;
   }>;
+  sendSMS?: boolean;
+  sendEmail?: boolean;
 }
 
 export interface Order {
@@ -136,14 +138,28 @@ export const orderService = {
     const response = await api.get('/api/orders', {
       params: { type: 'customer', id: customerId },
     });
-    return response.data;
+    // Handle 204 No Content response (empty orders)
+    return response.data || [];
+  },
+
+  getCourierOrders: async (courierId: number): Promise<Order[]> => {
+    const response = await api.get('/api/orders', {
+      params: { type: 'courier', id: courierId },
+    });
+    // Handle 204 No Content response (empty orders)
+    return response.data || [];
   },
 
   updateStatus: async (
     orderId: number,
     status: string
   ): Promise<{ status: string }> => {
-    const response = await api.post(`/api/order/${orderId}/status`, { status });
+    const response = await api.put(`/api/order/${orderId}/status`, { status });
+    return response.data;
+  },
+
+  getOrderById: async (orderId: number): Promise<Order> => {
+    const response = await api.get(`/api/orders/${orderId}`);
     return response.data;
   },
 };

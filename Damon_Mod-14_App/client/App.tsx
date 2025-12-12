@@ -3,11 +3,19 @@ type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Details: undefined;
+  AccountTypeSelection: {
+    customerId?: number;
+    courierId?: number;
+  };
   Restaurants: undefined;
   RestaurantMenu: { restaurant: any };
   OrderHistory: undefined;
 };
 import LoginScreen from './screens/LoginScreen';
+import AccountTypeSelectionScreen from './screens/AccountTypeSelectionScreen';
+import CustomerAccountScreen from './screens/CustomerAccountScreen';
+import CourierAccountScreen from './screens/CourierAccountScreen';
+import CourierDeliveriesScreen from './screens/CourierDeliveriesScreen';
 import RestaurantsScreen from './screens/RestaurantsScreen';
 import RestaurantMenuScreen from './screens/RestaurantMenuScreen';
 import OrderHistoryScreen from './screens/OrderHistoryScreen';
@@ -26,6 +34,10 @@ export default function App() {
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="AccountTypeSelection" component={AccountTypeSelectionScreen} />
+        <Stack.Screen name="CustomerAccount" component={CustomerAccountScreen} />
+        <Stack.Screen name="CourierAccount" component={CourierAccountScreen} />
+        <Stack.Screen name="CourierDeliveries" component={CourierDeliveriesScreen} />
         <Stack.Screen name="Restaurants" component={RestaurantsScreen} />
         <Stack.Screen name="RestaurantMenu" component={RestaurantMenuScreen} />
         <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />

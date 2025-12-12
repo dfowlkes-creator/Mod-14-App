@@ -11,6 +11,7 @@ type RootStackParamList = {
   Restaurants: undefined;
   RestaurantMenu: { restaurant: any };
   OrderHistory: undefined;
+  CustomerAccount: undefined;
 };
 
 interface OrderItem {
@@ -106,7 +107,7 @@ export default function OrderHistoryScreen() {
       <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require('../assets/Images/AppLogoV1.png')}
+          source={require('../assets/Images/AppLogoV2.png')}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -218,6 +219,15 @@ export default function OrderHistoryScreen() {
             <Text style={styles.navIconText}>🕐</Text>
           </View>
           <Text style={styles.navLabel}>OrderHistory</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => navigation.navigate('CustomerAccount')}
+        >
+          <View style={styles.navIcon}>
+            <Text style={styles.navIconText}>👤</Text>
+          </View>
+          <Text style={styles.navLabel}>Account</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -7,9 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CourierRepository extends JpaRepository <Courier, Integer> {
+public interface CourierRepository extends JpaRepository<Courier, Integer> {
     Optional<Courier> findByUserEntityId(int id);
 
     Optional<Courier> findByUserEntityId(Long id);
 
+    // Find courier by userEntity name (for assignment and migration)
+    Optional<Courier> findByUserEntity_Name(String name);
 }

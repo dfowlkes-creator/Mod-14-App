@@ -49,27 +49,43 @@ public class DataSeeder {
         this.courierRepository = courierRepository;
     }
 
-    @PostConstruct
-    public void seedData() {
-        // Check if data already exists
-        if (userRepository.count() > 0) {
-            System.out.println("Database already contains data. Skipping seeding.");
-            return;
+        @PostConstruct
+        public void seedData() {
+                // Check if data already exists
+                if (userRepository.count() > 0) {
+                        System.out.println("Database already contains data. Skipping seeding.");
+                        assignRandomCouriersToOrders();
+                        return;
+                }
+
+                System.out.println("Seeding database with test data for Mod 13...");
+                seedAddresses();
+                seedUsers();
+                seedRestaurants();
+                seedOrderStatuses();
+                seedEmployees();
+                seedCustomers();
+                seedProducts();
+                seedOrdersAndProductOrders();
+                seedCourierStatuses();
+                seedCouriers();
+                assignRandomCouriersToOrders();
+                System.out.println("Database seeding completed successfully.");
         }
 
-        System.out.println("Seeding database with test data for Mod 13...");
-        seedAddresses();
-        seedUsers();
-        seedRestaurants();
-        seedOrderStatuses();
-        seedEmployees();
-        seedCustomers();
-        seedProducts();
-        seedOrdersAndProductOrders();
-        seedCourierStatuses();
-        seedCouriers();
-        System.out.println("Database seeding completed successfully.");
-    }
+        private void assignRandomCouriersToOrders() {
+                List<Courier> couriers = courierRepository.findAll();
+                List<Order> orders = orderRepository.findAll();
+                java.util.Random random = new java.util.Random();
+                for (Order order : orders) {
+                        if (!couriers.isEmpty()) {
+                                Courier randomCourier = couriers.get(random.nextInt(couriers.size()));
+                                order.setCourier(randomCourier);
+                                orderRepository.save(order);
+                        }
+                }
+                System.out.println("Assigned random couriers to all orders.");
+        }
 
     private void seedUsers() {
         List<UserEntity> users = Arrays.asList(

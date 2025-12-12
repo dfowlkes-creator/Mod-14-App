@@ -20,39 +20,51 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+/**
+ * Entity representing a food delivery order in the RocketFood system.
+ * Contains references to restaurant, customer, courier, status, products, and
+ * timestamp.
+ * Used for persistence and business logic related to orders.
+ */
 @Entity
 @Table(name = "orders")
 public class Order {
+    /** Unique identifier for the order. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    /** Restaurant associated with the order. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "restaurant_id", nullable = false)
     private Restaurant restaurant;
 
+    /** Customer who placed the order. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    /** Current status of the order. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "status_id", nullable = false)
     private OrderStatus order_status;
 
+    /** Courier assigned to deliver the order. */
     @ManyToOne(cascade = CascadeType.REMOVE)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "courier_id")
     private Courier courier;
 
+    /** Rating given to the restaurant for this order (1-5). */
     @Column(nullable = false)
     @Min(1)
     @Max(5)
     private int restaurant_rating;
 
-    // New fields for products and total cost
+    /** List of products included in the order. */
     @JsonIgnore
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -75,6 +87,7 @@ public class Order {
         this.productOrders = productOrders;
     }
 
+    /** Timestamp when the order was created. */
     @Column(name = "timestamp", nullable = false, updatable = false)
     private LocalDateTime timestamp;
 

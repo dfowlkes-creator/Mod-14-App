@@ -3,7 +3,7 @@ package com.rocketFoodDelivery.rocketFood.service;
 import com.rocketFoodDelivery.rocketFood.dtos.ApiOrderDTO;
 import com.rocketFoodDelivery.rocketFood.dtos.ApiOrderStatusDTO;
 import com.rocketFoodDelivery.rocketFood.dtos.ApiProductForOrderApiDTO;
-import com.rocketFoodDelivery.rocketFood.exception.ResourceNotFoundException;
+// ...existing code...
 import com.rocketFoodDelivery.rocketFood.models.*;
 import com.rocketFoodDelivery.rocketFood.repository.*;
 import jakarta.persistence.EntityManager;
@@ -16,6 +16,34 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
+    /**
+     * Retrieves a single order by its ID and converts it to ApiOrderDTO.
+     * 
+     * @param orderId The ID of the order to retrieve.
+     * @return ApiOrderDTO if found, otherwise null.
+     */
+    public ApiOrderDTO getOrderById(int orderId) {
+        return orderRepository.findById(orderId)
+                .map(this::convertToApiOrderDTO)
+                .orElse(null);
+    }
+
+    /**
+     * Updates the restaurant rating for a specific order.
+     * 
+     * @param orderId The ID of the order to update.
+     * @param rating  The new rating value (1-5).
+     * @return true if updated, false if not found.
+     */
+    public boolean updateOrderRating(int orderId, int rating) {
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return false;
+        }
+        order.setRestaurant_rating(rating);
+        orderRepository.save(order);
+        return true;
+    }
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -163,8 +191,9 @@ public class OrderService {
 
     // Retrieves the username for a given courier ID
     private String getUserNameByCourierId(int courierId) {
-        return userRepository.findById(courierId)
-                .map(UserEntity::getName)
+        // Always resolve courier name using Courier entity and its UserEntity
+        return courierRepository.findById(courierId)
+                .map(courier -> courier.getUserEntity().getName())
                 .orElse("Unknown");
     }
 
@@ -227,11 +256,23 @@ public class OrderService {
             order.setRestaurant(restaurant);
 
             // Generate a random restaurant rating between 1 and 5
+            // ...existing code...
+
+            // Set the customer and restaurant details in the Order entity
+            order.setCustomer(customer);
+            order.setRestaurant(restaurant);
+
+            // Generate a random restaurant rating between 1 and 5
             int randomRating = (int) (Math.random() * 5) + 1;
             order.setRestaurant_rating(randomRating);
 
             // Set the initial status of the order
             order.setOrderStatus(status); // Default status, could be updated later
+
+            // Automatically assign a courier (Jane Doe preferred, fallback to Erica Ger)
+            Courier assignedCourier = courierRepository.findByUserEntity_Name("Jane Doe")
+                    .orElseGet(() -> courierRepository.findByUserEntity_Name("Erica Ger").orElse(null));
+            order.setCourier(assignedCourier);
 
             // Process the products
             List<ProductOrder> productOrders = apiOrderDTO.getProducts().stream()
@@ -259,7 +300,7 @@ public class OrderService {
             // Convert the saved order to ApiOrderDTO for the response
             ApiOrderDTO createdOrderDTO = convertToApiOrderDTO(order);
 
-            // Send a notification email-
+            // Send a notification email
             if (apiOrderDTO.isSendEmail()) {
                 notificationService.sendEmailNotification(
                         customer.getEmail(),
@@ -272,9 +313,7 @@ public class OrderService {
                         + "We have received your Order (ID: #" + createdOrderDTO.getId() + ") for the restaurant: "
                         + createdOrderDTO.getRestaurant_name() + " and with a total cost of "
                         + createdOrderDTO.getTotal_cost()
-                        + "$. We are currently processing your order and will soon be on our way to deliver to you."; // Customize
-                                                                                                                      // the
-                                                                                                                      // message
+                        + "$. We are currently processing your order and will soon be on our way to deliver to you.";
                 notificationService.sendSmsNotification(
                         customer.getPhone(),
                         message);
@@ -289,34 +328,20 @@ public class OrderService {
         }
     }
 
-    public ApiOrderDTO getOrderById(int orderId) {
-        // Retrieve the order from the repository
-        Order order = orderRepository.findById(orderId).orElse(null);
-
-        // Check if the order exists
-        if (order == null) {
-            return null;
+    /**
+     * Migration method: Updates all orders with John Doe as courier to Jane Doe.
+     * Call this once to fix historical data.
+     */
+    public void migrateJohnDoeOrdersToJaneDoe() {
+        Courier janeDoe = courierRepository.findByUserEntity_Name("Jane Doe").orElse(null);
+        Courier johnDoe = courierRepository.findByUserEntity_Name("John Doe").orElse(null);
+        if (janeDoe != null && johnDoe != null) {
+            List<Order> orders = orderRepository.findByCourierId(johnDoe.getId());
+            for (Order order : orders) {
+                order.setCourier(janeDoe);
+                orderRepository.save(order);
+            }
         }
-
-        // Convert the Order entity to DTO and return
-        return convertToApiOrderDTO(order);
-    }
-
-    public String getCustomerEmail(int customerId) {
-        return userRepository.findById(customerId)
-                .map(UserEntity::getEmail)
-                .orElse(null);
-
-    }
-
-    public boolean updateOrderRating(int orderId, int newRating) {
-        // Find the order by ID
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        // Update the rating
-        order.setRestaurant_rating(newRating);
-        orderRepository.save(order);
-        return true;
     }
 
 }
