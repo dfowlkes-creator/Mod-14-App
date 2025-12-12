@@ -30,14 +30,16 @@ public class NotificationService {
     private String notifyTemplateId;
 
     public void sendSmsNotification(String to, String message) {
-            // Dummy placeholder for SMS notification
-            System.out.println("[DUMMY SMS] To: +1234567890 | Message: Your order has been placed successfully! (This is a test notification)");
+        // Dummy placeholder for SMS notification
+        System.out.println(
+                "[DUMMY SMS] To: +1234567890 | Message: Your order has been placed successfully! (This is a test notification)");
     }
 
     public void sendEmailNotification(String customerEmail, ApiOrderDTO orderDTO) {
         System.out.println();
         System.out.println("Thank you, John Doe!\n");
-        System.out.println("We have received your Order (ID: #111) for the Restaurant: Amazing Greek and with a total cost of $20.00. We are currently processing your order and will soon be on our way to deliver to you.\n");
+        System.out.println(
+                "We have received your Order (ID: #111) for the Restaurant: Amazing Greek and with a total cost of $20.00. We are currently processing your order and will soon be on our way to deliver to you.\n");
         System.out.println("Sincerely,\nRocket Food Delivery");
         System.out.println();
     }

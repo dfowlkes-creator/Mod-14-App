@@ -164,7 +164,11 @@ public class RestaurantApiController {
     public ResponseEntity<Object> getAllRestaurants(
             @RequestParam(name = "rating", required = false) Integer rating,
             @RequestParam(name = "price_range", required = false) Integer priceRange) {
-        return ResponseBuilder
-                .buildOkResponse(restaurantService.findRestaurantsByRatingAndPriceRange(rating, priceRange));
+        var restaurants = restaurantService.findRestaurantsByRatingAndPriceRange(rating, priceRange);
+        if (restaurants == null || restaurants.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", "No restaurants found"));
+        }
+        return ResponseBuilder.buildOkResponse(restaurants);
     }
 }
