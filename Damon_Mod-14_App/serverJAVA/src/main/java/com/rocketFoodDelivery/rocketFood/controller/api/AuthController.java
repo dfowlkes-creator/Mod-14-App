@@ -11,6 +11,7 @@ import com.rocketFoodDelivery.rocketFood.models.UserEntity;
 import com.rocketFoodDelivery.rocketFood.repository.CourierRepository;
 import com.rocketFoodDelivery.rocketFood.repository.CustomerRepository;
 import com.rocketFoodDelivery.rocketFood.repository.UserRepository;
+import com.rocketFoodDelivery.rocketFood.security.JwtUtil;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,17 @@ public class AuthController {
     private final CourierRepository courierRepository;
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @Autowired
     AuthenticationManager authManager;
 
     public AuthController(CourierRepository courierRepository, CustomerRepository customerRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository, JwtUtil jwtUtil) {
         this.courierRepository = courierRepository;
         this.customerRepository = customerRepository;
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/api/auth")
@@ -55,16 +58,18 @@ public class AuthController {
             Optional<Courier> courier = courierRepository.findByUserEntityId(user.getId());
             Optional<Customer> customer = customerRepository.findByUserEntityId(user.getId());
 
+            String token = jwtUtil.generateToken(user.getEmail());
+
             AuthResponseSuccessDTO response = new AuthResponseSuccessDTO();
             response.setSuccess(true);
+            response.setAccessToken(token);
+            response.setUser_id(user.getId());
             if (courier.isPresent()) {
                 response.setCourier_id(courier.get().getId());
             }
             if (customer.isPresent()) {
                 response.setCustomer_id(customer.get().getId());
             }
-            response.setSuccess(true);
-            response.setUser_id(user.getId());
             return ResponseEntity.ok().body(response);
         } catch (BadCredentialsException e) {
             AuthResponseErrorDTO response = new AuthResponseErrorDTO();
